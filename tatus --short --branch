@@ -1,0 +1,366 @@
+[1mdiff --git a/serial_at_test.py b/serial_at_test.py[m
+[1mindex 839f9d8..21d99b7 100644[m
+[1m--- a/serial_at_test.py[m
+[1m+++ b/serial_at_test.py[m
+[36m@@ -1,58 +1,158 @@[m
+ import argparse[m
+[32m+[m[32mimport json[m
+ import sys[m
+[32m+[m[32mimport threading[m
+ import time[m
+[32m+[m[32mimport webbrowser[m
+[32m+[m[32mfrom dataclasses import dataclass[m
+[32m+[m[32mfrom datetime import datetime[m
+[32m+[m[32mfrom pathlib import Path[m
+[32m+[m[32mfrom typing import Any[m
+ [m
+ import serial[m
+ [m
+ [m
+[32m+[m[32mDEFAULT_CONFIG_PATH = Path(__file__).with_name("serial_config.json")[m
+[32m+[m[32mVIEWER_PATH = Path(__file__).with_name("log_viewer.html")[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@dataclass(frozen=True)[m
+[32m+[m[32mclass SerialConfig:[m
+[32m+[m[32m    test_suite: str[m
+[32m+[m[32m    ports: list[str][m
+[32m+[m[32m    commands: list[str][m
+[32m+[m[32m    pre_commands: list[str][m
+[32m+[m[32m    post_commands: list[str][m
+[32m+[m[32m    baud: int[m
+[32m+[m[32m    timeout: float[m
+[32m+[m[32m    prompt_prefix: str[m
+[32m+[m[32m    line_ending: str[m
+[32m+[m[32m    log_dir: Path[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass ThreadSafeJsonLogger:[m
+[32m+[m[32m    def __init__(self, path: Path, config: SerialConfig, config_path: Path) -> None:[m
+[32m+[m[32m        self.lock = threading.Lock()[m
+[32m+[m[32m        self.path = path[m
+[32m+[m[32m        self.data: dict[str, Any] = {[m
+[32m+[m[32m            "started_at": timestamp(),[m
+[32m+[m[32m            "finished_at": None,[m
+[32m+[m[32m            "test_suite": config.test_suite,[m
+[32m+[m[32m            "config_path": str(config_path),[m
+[32m+[m[32m            "settings": {[m
+[32m+[m[32m                "test_suite": config.test_suite,[m
+[32m+[m[32m                "baud": config.baud,[m
+[32m+[m[32m                "timeout": config.timeout,[m
+[32m+[m[32m                "prompt_prefix": config.prompt_prefix,[m
+[32m+[m[32m                "line_ending": config.line_ending,[m
+[32m+[m[32m            },[m
+[32m+[m[32m            "devices": {[m
+[32m+[m[32m                port: {[m
+[32m+[m[32m                    "port": port,[m
+[32m+[m[32m                    "status": "PENDING",[m
+[32m+[m[32m                    "commands": [],[m
+[32m+[m[32m                    "errors": [],[m
+[32m+[m[32m                }[m
+[32m+[m[32m                for port in config.ports[m
+[32m+[m[32m            },[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m    def add_command(self, port: str, record: dict[str, Any]) -> None:[m
+[32m+[m[32m        with self.lock:[m
+[32m+[m[32m            self.data["devices"][port]["commands"].append(record)[m
+[32m+[m
+[32m+[m[32m    def add_error(self, port: str, message: str) -> None:[m
+[32m+[m[32m        with self.lock:[m
+[32m+[m[32m            self.data["devices"][port]["status"] = "ERROR"[m
+[32m+[m[32m            self.data["devices"][port]["errors"].append([m
+[32m+[m[32m                {[m
+[32m+[m[32m                    "timestamp": timestamp(),[m
+[32m+[m[32m                    "message": message,[m
+[32m+[m[32m                }[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m[32m    def set_device_status(self, port: str, status: str) -> None:[m
+[32m+[m[32m        with self.lock:[m
+[32m+[m[32m            self.data["devices"][port]["status"] = status[m
+[32m+[m
+[32m+[m[32m    def save(self) -> None:[m
+[32m+[m[32m        with self.lock:[m
+[32m+[m[32m            self.data["finished_at"] = timestamp()[m
+[32m+[m[32m            self.path.write_text([m
+[32m+[m[32m                json.dumps(self.data, indent=2, ensure_ascii=False),[m
+[32m+[m[32m                encoding="utf-8",[m
+[32m+[m[32m            )[m
+[32m+[m
+[32m+[m
+ def parse_args() -> argparse.Namespace:[m
+     parser = argparse.ArgumentParser([m
+[31m-        description="Send one serial command over a serial port and print raw/decoded response."[m
+[32m+[m[32m        description="Poll one or more serial ports from a JSON config and log responses."[m
+     )[m
+[31m-    parser.add_argument("--port", required=True, help="Serial port name, e.g. COM5")[m
+[31m-    parser.add_argument("--cmd", required=True, help="AT command text, e.g. AT")[m
+[31m-    parser.add_argument("--baud", type=int, default=4096, help="Baud rate (default: 4096)")[m
+     parser.add_argument([m
+[31m-        "--timeout",[m
+[31m-        type=float,[m
+[31m-        default=3,[m
+[31m-        help="Read timeout in seconds (default: 3)",[m
+[32m+[m[32m        "--config",[m
+[32m+[m[32m        default=str(DEFAULT_CONFIG_PATH),[m
+[32m+[m[32m        help=f"Path to JSON config file (default: {DEFAULT_CONFIG_PATH})",[m
+     )[m
+     parser.add_argument([m
+[31m-        "--startup-wait",[m
+[31m-        type=float,[m
+[31m-        default=0.0,[m
+[31m-        help="Seconds to collect startup text before sending command (default: 0.0)",[m
+[31m-    )[m
+[31m-    parser.add_argument([m
+[31m-        "--wait-for-prompt",[m
+[32m+[m[32m        "--no-viewer",[m
+         action="store_true",[m
+[31m-        help="During startup wait, stop early when prompt marker is seen",[m
+[31m-    )[m
+[31m-    parser.add_argument([m
+[31m-        "--prompt-marker",[m
+[31m-        default=">>",[m
+[31m-        help="Prompt marker text used with --wait-for-prompt (default: >>)",[m
+[31m-    )[m
+[31m-    parser.add_argument([m
+[31m-        "--line-ending",[m
+[31m-        choices=("none", "cr", "lf", "crlf"),[m
+[31m-        default="cr",[m
+[31m-        help="Line ending to append (default: cr)",[m
+[31m-    )[m
+[31m-    parser.add_argument([m
+[31m-        "--pre-cmd",[m
+[31m-        help="Optional command to send first (for example: con)",[m
+[31m-    )[m
+[31m-    parser.add_argument([m
+[31m-        "--pre-cmd-wait",[m
+[31m-        type=float,[m
+[31m-        default=1.0,[m
+[31m-        help="Seconds to wait for response after --pre-cmd (default: 1.0)",[m
+[32m+[m[32m        help="Do not generate and open the HTML viewer after polling.",[m
+     )[m
+     return parser.parse_args()[m
+ [m
+ [m
+[32m+[m[32mdef load_config(path: Path) -> SerialConfig:[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        raw_config = json.loads(path.read_text(encoding="utf-8"))[m
+[32m+[m[32m    except FileNotFoundError:[m
+[32m+[m[32m        raise ValueError(f"Config file not found: {path}") from None[m
+[32m+[m[32m    except json.JSONDecodeError as exc:[m
+[32m+[m[32m        raise ValueError(f"Invalid JSON config '{path}': {exc}") from None[m
+[32m+[m
+[32m+[m[32m    ports = require_string_list(raw_config, "ports")[m
+[32m+[m[32m    commands = require_string_list(raw_config, "commands")[m
+[32m+[m
+[32m+[m[32m    if not ports:[m
+[32m+[m[32m        raise ValueError("Config value 'ports' must include at least one COM port.")[m
+[32m+[m[32m    if not commands:[m
+[32m+[m[32m        raise ValueError("Config value 'commands' must include at least one command.")[m
+[32m+[m
+[32m+[m[32m    line_ending = str(raw_config.get("line_ending", "cr")).lower()[m
+[32m+[m[32m    if line_ending not in {"none", "cr", "lf", "crlf"}:[m
+[32m+[m[32m        raise ValueError("Config value 'line_ending' must be one of: none, cr, lf, crlf.")[m
+[32m+[m
+[32m+[m[32m    return SerialConfig([m
+[32m+[m[32m        test_suite=str(raw_config.get("test_suite", "Serial Log Viewer")),[m
+[32m+[m[32m        ports=ports,[m
+[32m+[m[32m        commands=commands,[m
+[32m+[m[32m        pre_commands=optional_string_list(raw_config, "pre_commands"),[m
+[32m+[m[32m        post_commands=optional_string_list(raw_config, "post_commands"),[m
+[32m+[m[32m        baud=int(raw_config.get("baud", 4096)),[m
+[32m+[m[32m        timeout=float(raw_config.get("timeout", 10.0)),[m
+[32m+[m[32m        prompt_prefix=str(raw_config.get("prompt_prefix", "# SGS")),[m
+[32m+[m[32m        line_ending=line_ending,[m
+[32m+[m[32m        log_dir=Path(str(raw_config.get("log_dir", "logs"))),[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef require_string_list(config: dict[str, Any], key: str) -> list[str]:[m
+[32m+[m[32m    if key not in config:[m
+[32m+[m[32m        raise ValueError(f"Config value '{key}' is required.")[m
+[32m+[m[32m    return coerce_string_list(config[key], key)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef optional_string_list(config: dict[str, Any], key: str) -> list[str]:[m
+[32m+[m[32m    if key not in config:[m
+[32m+[m[32m        return [][m
+[32m+[m[32m    return coerce_string_list(config[key], key)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef coerce_string_list(value: Any, key: str) -> list[str]:[m
+[32m+[m[32m    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):[m
+[32m+[m[32m        raise ValueError(f"Config value '{key}' must be a list of strings.")[m
+[32m+[m[32m    return value[m
+[32m+[m
+[32m+[m
+ def get_line_ending_bytes(mode: str) -> bytes:[m
+     mapping = {[m
+         "none": b"",[m
+[36m@@ -63,128 +163,316 @@[m [mdef get_line_ending_bytes(mode: str) -> bytes:[m
+     return mapping[mode][m
+ [m
+ [m
+[31m-def read_until_timeout(ser: serial.Serial, timeout: float) -> bytes:[m
+[31m-    deadline = time.monotonic() + timeout[m
+[31m-    chunks = bytearray()[m
+[32m+[m[32mdef build_command_bytes(command: str, line_ending: str) -> bytes:[m
+[32m+[m[32m    return command.encode("ascii", errors="strict") + get_line_ending_bytes(line_ending)[m
+ [m
+[31m-    while time.monotonic() < deadline:[m
+[31m-        waiting = ser.in_waiting[m
+[31m-        if waiting:[m
+[31m-            chunks.extend(ser.read(waiting))[m
+[32m+[m
+[32m+[m[32mdef timestamp() -> str:[m
+[32m+[m[32m    return datetime.now().astimezone().isoformat(timespec="milliseconds")[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef prompt_has_returned(response: bytes, prompt_prefix: str) -> bool:[m
+[32m+[m[32m    text = response.decode("utf-8", errors="replace")[m
+[32m+[m[32m    for line in text.replace("\r", "\n").split("\n"):[m
+[32m+[m[32m        if line.lstrip().startswith(prompt_prefix):[m
+[32m+[m[32m            return True[m
+[32m+[m[32m    return False[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef clean_response_lines(response: bytes, prompt_prefix: str) -> list[str]:[m
+[32m+[m[32m    text = response.decode("utf-8", errors="replace")[m
+[32m+[m[32m    lines: list[str] = [][m
+[32m+[m
+[32m+[m[32m    for line in text.replace("\r", "\n").split("\n"):[m
+[32m+[m[32m        line = line.strip()[m
+[32m+[m[32m        if not line or line.startswith(prompt_prefix) or ">>" in line:[m
+             continue[m
+[31m-        time.sleep(0.05)[m
+[32m+[m[32m        lines.append(line)[m
+ [m
+[31m-    waiting = ser.in_waiting[m
+[31m-    if waiting:[m
+[31m-        chunks.extend(ser.read(waiting))[m
+[32m+[m[32m    return lines[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef parse_response_fields(lines: list[str]) -> dict[str, str | list[str]]:[m
+[32m+[m[32m    parsed: dict[str, str | list[str]] = {}[m
+[32m+[m
+[32m+[m[32m    for line in lines:[m
+[32m+[m[32m        if ":" not in line:[m
+[32m+[m[32m            continue[m
+ [m
+[31m-    return bytes(chunks)[m
+[32m+[m[32m        key, value = line.split(":", 1)[m
+[32m+[m[32m        key = key.strip()[m
+[32m+[m[32m        value = value.strip()[m
+[32m+[m[32m        if not key:[m
+[32m+[m[32m            continue[m
+[32m+[m[32m        if key not in parsed:[m
+[32m+[m[32m            parsed[key] = value[m
+[32m+[m[32m            continue[m
+[32m+[m[32m        existing_value = parsed[key][m
+[32m+[m[32m        if isinstance(existing_value, list):[m
+[32m+[m[32m            existing_value.append(value)[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            parsed[key] = [existing_value, value][m
+[32m+[m
+[32m+[m[32m    return parsed[m
+ [m
+ [m
+[31m-def read_with_optional_marker([m
+[31m-    ser: serial.Serial, timeout: float, marker: bytes | None = None[m
+[31m-) -> bytes:[m
+[32m+[m[32mdef read_until_prompt([m
+[32m+[m[32m    ser: serial.Serial,[m
+[32m+[m[32m    timeout: float,[m
+[32m+[m[32m    prompt_prefix: str,[m
+[32m+[m[32m) -> tuple[bytes, bool, float]:[m
+     deadline = time.monotonic() + timeout[m
+[32m+[m[32m    started_at = time.monotonic()[m
+     chunks = bytearray()[m
+ [m
+     while time.monotonic() < deadline:[m
+         waiting = ser.in_waiting[m
+         if waiting:[m
+             chunks.extend(ser.read(waiting))[m
+[31m-            if marker and marker in chunks:[m
+[31m-                break[m
+[32m+[m[32m            if prompt_has_returned(bytes(chunks), prompt_prefix):[m
+[32m+[m[32m                return bytes(chunks), True, time.monotonic() - started_at[m
+             continue[m
+[31m-        time.sleep(0.05)[m
+[32m+[m[32m        time.sleep(0.02)[m
+ [m
+     waiting = ser.in_waiting[m
+     if waiting:[m
+         chunks.extend(ser.read(waiting))[m
+ [m
+[31m-    return bytes(chunks)[m
+[32m+[m[32m    return bytes(chunks), prompt_has_returned(bytes(chunks), prompt_prefix), time.monotonic() - started_at[m
+ [m
+ [m
+[31m-def build_command_bytes(cmd: str, line_ending: str) -> bytes:[m
+[31m-    return cmd.encode("ascii", errors="strict") + get_line_ending_bytes(line_ending)[m
+[32m+[m[32mdef open_serial(port: str, config: SerialConfig) -> serial.Serial:[m
+[32m+[m[32m    return serial.Serial([m
+[32m+[m[32m        port=port,[m
+[32m+[m[32m        baudrate=config.baud,[m
+[32m+[m[32m        bytesize=serial.EIGHTBITS,[m
+[32m+[m[32m        parity=serial.PARITY_NONE,[m
+[32m+[m[32m        stopbits=serial.STOPBITS_ONE,[m
+[32m+[m[32m        timeout=0,[m
+[32m+[m[32m        write_timeout=config.timeout,[m
+[32m+[m[32m    )[m
+ [m
+ [m
+[31m-def main() -> int:[m
+[31m-    args = parse_args()[m
+[32m+[m[32mdef command_plan(config: SerialConfig) -> list[tuple[str, str]]:[m
+[32m+[m[32m    plan: list[tuple[str, str]] = [][m
+[32m+[m[32m    plan.extend(("pre", command) for command in config.pre_commands)[m
+[32m+[m[32m    plan.extend(("test", command) for command in config.commands)[m
+[32m+[m[32m    plan.extend(("post", command) for command in config.post_commands)[m
+[32m+[m[32m    return plan[m
+[32m+[m
+ [m
+[31m-    command_bytes = build_command_bytes(args.cmd, args.line_ending)[m
+[32m+[m[32mdef run_command([m
+[32m+[m[32m    ser: serial.Serial,[m
+[32m+[m[32m    logger: ThreadSafeJsonLogger,[m
+[32m+[m[32m    port: str,[m
+[32m+[m[32m    phase: str,[m
+[32m+[m[32m    command: str,[m
+[32m+[m[32m    config: SerialConfig,[m
+[32m+[m[32m) -> bool:[m
+[32m+[m[32m    command_bytes = build_command_bytes(command, config.line_ending)[m
+[32m+[m[32m    sent_at = timestamp()[m
+[32m+[m[32m    started_at = time.monotonic()[m
+ [m
+     try:[m
+[31m-        ser = serial.Serial([m
+[31m-            port=args.port,[m
+[31m-            baudrate=args.baud,[m
+[31m-            bytesize=serial.EIGHTBITS,[m
+[31m-            parity=serial.PARITY_NONE,[m
+[31m-            stopbits=serial.STOPBITS_ONE,[m
+[31m-            timeout=args.timeout,[m
+[31m-            write_timeout=args.timeout,[m
+[32m+[m[32m        ser.write(command_bytes)[m
+[32m+[m[32m        ser.flush()[m
+[32m+[m[32m        response, prompt_seen, elapsed = read_until_prompt([m
+[32m+[m[32m            ser,[m
+[32m+[m[32m            config.timeout,[m
+[32m+[m[32m            config.prompt_prefix,[m
+         )[m
+[32m+[m[32m    except Exception as exc:[m
+[32m+[m[32m        elapsed = time.monotonic() - started_at[m
+[32m+[m[32m        logger.add_command([m
+[32m+[m[32m            port,[m
+[32m+[m[32m            {[m
+[32m+[m[32m                "timestamp": sent_at,[m
+[32m+[m[32m                "phase": phase,[m
+[32m+[m[32m                "command": command,[m
+[32m+[m[32m                "status": "ERROR",[m
+[32m+[m[32m                "elapsed_seconds": round(elapsed, 3),[m
+[32m+[m[32m                "response_bytes": 0,[m
+[32m+
