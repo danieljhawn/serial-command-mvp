@@ -1,0 +1,12 @@
+{
+  "ports": ["COM11", "COM12", "COM13", "COM14"],
+  "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+  "baud": 4096,
+  "timeout": 10,
+  "prompt_prefix": "# SGS",
+  "line_ending": "cr",
+  "log_dir": "logs",
+  "pre_commands": [],
+  "commands": ["con", "sta", "eve"],
+  "post_commands": []
+}
