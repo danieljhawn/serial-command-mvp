@@ -1,0 +1,4799 @@
+{
+  "generated_at": "2026-06-22T11:34:21-05:00",
+  "source_csv": "C:\\Users\\dhawn\\Desktop\\CODE\\proofOfConceptSerialLog\\condensedTestResults.csv",
+  "source_log_dir": "C:\\Users\\dhawn\\Desktop\\CODE\\proofOfConceptSerialLog\\logs",
+  "tests": [
+    {
+      "id": "test-1",
+      "kind": "test",
+      "timestamp": "2026-06-18T10:46:57-05:00",
+      "title": "SOTF",
+      "expected_result": "Red, SOTF, Permanent",
+      "device_results": {
+        "16169005780312": "red, SOTF, Permanent",
+        "16169005769844": "red, SOTF, Permanent",
+        "16169005782524": "red, SOTF, Permanent",
+        "16169005770891": "red, SOTF, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-2",
+      "kind": "test",
+      "timestamp": "2026-06-18T10:55:08-05:00",
+      "title": "SM Load Fault",
+      "expected_result": "Red, SOTF, Permanent",
+      "device_results": {
+        "16169005780312": "red, SOTF, Permanent",
+        "16169005769844": "red, SOTF, Permanent",
+        "16169005782524": "red, SOTF, Permanent",
+        "16169005770891": "red, SOTF, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-3",
+      "kind": "test",
+      "timestamp": "2026-06-18T11:24:01-05:00",
+      "title": "High Impedance",
+      "expected_result": "Red, PFault, Permanent",
+      "device_results": {
+        "16169005780312": "red, PFault, Permanent",
+        "16169005769844": "red, PFault, Permanent",
+        "16169005782524": "red, PFault, Permanent",
+        "16169005770891": "red, PFault, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-4",
+      "kind": "test",
+      "timestamp": "2026-06-18T11:47:31-05:00",
+      "title": "Fault - F 1 Shot",
+      "expected_result": "Red, PFault, Permanent",
+      "device_results": {
+        "16169005780312": "red, PFault, Permanent",
+        "16169005769844": "red, PFault, Permanent",
+        "16169005782524": "red, PFault, Permanent",
+        "16169005770891": "red, PFault, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-5",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:03:03-05:00",
+      "title": "Temp Normal",
+      "expected_result": "Red Yellow Yellow, TFault, Temporary",
+      "device_results": {
+        "16169005780312": "RYY, TFault, Temporary",
+        "16169005769844": "RYY, TFault, Temporary",
+        "16169005782524": "RYY, TFault, Temporary",
+        "16169005770891": "RYY, TFault, Temporary"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-6",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:16:38-05:00",
+      "title": "20% Below Fault",
+      "expected_result": "Red, PFault, Permanent",
+      "device_results": {
+        "16169005780312": "red, <50 Fault\nPFault, PTF-LL",
+        "16169005769844": "red, <50 Fault\nPFault, PTF-LL",
+        "16169005782524": "red, <50 Fault\nPFault, PTF-LL",
+        "16169005770891": "red, <50 Fault\nPFault, PTF-LL"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-7",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:42:20-05:00",
+      "title": "Ride Through",
+      "expected_result": "None, Fault Like , None",
+      "device_results": {
+        "16169005780312": "none, Fault Like, none",
+        "16169005769844": "none, Fault Like, none",
+        "16169005782524": "none, Fault Like, none",
+        "16169005770891": "none, Fault Like, none"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-8",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:54:45-05:00",
+      "title": "Inrush Energize",
+      "expected_result": "None, Fault <50\nSOTF\nCurrent Reset, None (?)",
+      "device_results": {
+        "16169005780312": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset",
+        "16169005769844": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset",
+        "16169005782524": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset",
+        "16169005770891": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-9",
+      "kind": "test",
+      "timestamp": "2026-06-18T13:56:43-05:00",
+      "title": "Inrush Reclose 1",
+      "expected_result": "None, None, None",
+      "device_results": {
+        "16169005780312": "None, None, None",
+        "16169005769844": "None, None, None",
+        "16169005782524": "None, None, None",
+        "16169005770891": "None, None, None"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-10",
+      "kind": "test",
+      "timestamp": "2026-06-18T14:06:06-05:00",
+      "title": "Inrush Reclose 2",
+      "expected_result": "None, None, None",
+      "device_results": {
+        "16169005780312": "None, None, None",
+        "16169005769844": "None, None, None",
+        "16169005782524": "None, None, None",
+        "16169005770891": "None, None, None"
+      },
+      "notes": ""
+    },
+    {
+      "id": "test-11",
+      "kind": "test",
+      "timestamp": "2026-06-18T14:16:21-05:00",
+      "title": "Large Load Kickin",
+      "expected_result": "None, Fault Like, None",
+      "device_results": {
+        "16169005780312": "None, Fault Like, None",
+        "16169005769844": "None, Fault Like, None",
+        "16169005782524": "None, Fault Like, None",
+        "16169005770891": "None, Fault Like, None"
+      },
+      "notes": ""
+    }
+  ],
+  "logs": [
+    {
+      "id": "serial_log_20260618_102925",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:29:25.912-05:00",
+      "finished_at": "2026-06-18T10:29:28.285-05:00",
+      "title": "serial_log_20260618_102925",
+      "test_suite": "",
+      "file": "serial_log_20260618_102925.json",
+      "viewer_file": "serial_log_20260618_102925_viewer.html",
+      "commands": [
+        "con",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "17 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_103429",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:34:29.213-05:00",
+      "finished_at": "2026-06-18T10:34:31.599-05:00",
+      "title": "serial_log_20260618_103429",
+      "test_suite": "",
+      "file": "serial_log_20260618_103429.json",
+      "viewer_file": "serial_log_20260618_103429_viewer.html",
+      "commands": [
+        "con",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "12 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_103540",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:35:40.849-05:00",
+      "finished_at": "2026-06-18T10:35:45.014-05:00",
+      "title": "serial_log_20260618_103540",
+      "test_suite": "",
+      "file": "serial_log_20260618_103540.json",
+      "viewer_file": "serial_log_20260618_103540_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "11 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_103832",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:38:32.751-05:00",
+      "finished_at": "2026-06-18T10:38:36.941-05:00",
+      "title": "serial_log_20260618_103832",
+      "test_suite": "",
+      "file": "serial_log_20260618_103832.json",
+      "viewer_file": "serial_log_20260618_103832_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "5",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "8 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_104607",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:46:07.086-05:00",
+      "finished_at": "2026-06-18T10:46:11.261-05:00",
+      "title": "serial_log_20260618_104607",
+      "test_suite": "",
+      "file": "serial_log_20260618_104607.json",
+      "viewer_file": "serial_log_20260618_104607_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "5",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "0 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_105239",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:52:39.258-05:00",
+      "finished_at": "2026-06-18T10:52:43.592-05:00",
+      "title": "serial_log_20260618_105239",
+      "test_suite": "",
+      "file": "serial_log_20260618_105239.json",
+      "viewer_file": "serial_log_20260618_105239_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "3",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "7",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-1",
+      "next_test_id": "test-2",
+      "position_label": "5 min after SOTF / 2 min before SM Load Fault"
+    },
+    {
+      "id": "serial_log_20260618_105412",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:54:12.945-05:00",
+      "finished_at": "2026-06-18T10:54:17.156-05:00",
+      "title": "serial_log_20260618_105412",
+      "test_suite": "",
+      "file": "serial_log_20260618_105412.json",
+      "viewer_file": "serial_log_20260618_105412_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "3",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "7",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-1",
+      "next_test_id": "test-2",
+      "position_label": "7 min after SOTF / 0 min before SM Load Fault"
+    },
+    {
+      "id": "serial_log_20260618_110233",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:02:33.680-05:00",
+      "finished_at": "2026-06-18T11:02:38.102-05:00",
+      "title": "serial_log_20260618_110233",
+      "test_suite": "",
+      "file": "serial_log_20260618_110233.json",
+      "viewer_file": "serial_log_20260618_110233_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-2",
+      "next_test_id": "test-3",
+      "position_label": "7 min after SM Load Fault / 21 min before High Impedance"
+    },
+    {
+      "id": "serial_log_20260618_112325",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:23:25.474-05:00",
+      "finished_at": "2026-06-18T11:23:29.728-05:00",
+      "title": "serial_log_20260618_112325",
+      "test_suite": "",
+      "file": "serial_log_20260618_112325.json",
+      "viewer_file": "serial_log_20260618_112325_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-2",
+      "next_test_id": "test-3",
+      "position_label": "28 min after SM Load Fault / 0 min before High Impedance"
+    },
+    {
+      "id": "serial_log_20260618_113112",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:31:12.394-05:00",
+      "finished_at": "2026-06-18T11:31:16.903-05:00",
+      "title": "serial_log_20260618_113112",
+      "test_suite": "",
+      "file": "serial_log_20260618_113112.json",
+      "viewer_file": "serial_log_20260618_113112_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "16",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "19",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "16",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-3",
+      "next_test_id": "test-4",
+      "position_label": "7 min after High Impedance / 16 min before Fault - F 1 Shot"
+    },
+    {
+      "id": "serial_log_20260618_113738",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:37:38.856-05:00",
+      "finished_at": "2026-06-18T11:37:43.343-05:00",
+      "title": "serial_log_20260618_113738",
+      "test_suite": "",
+      "file": "serial_log_20260618_113738.json",
+      "viewer_file": "serial_log_20260618_113738_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "19",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-3",
+      "next_test_id": "test-4",
+      "position_label": "13 min after High Impedance / 9 min before Fault - F 1 Shot"
+    },
+    {
+      "id": "serial_log_20260618_114421",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:44:21.070-05:00",
+      "finished_at": "2026-06-18T11:44:25.493-05:00",
+      "title": "serial_log_20260618_114421",
+      "test_suite": "",
+      "file": "serial_log_20260618_114421.json",
+      "viewer_file": "serial_log_20260618_114421_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "19",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-3",
+      "next_test_id": "test-4",
+      "position_label": "20 min after High Impedance / 3 min before Fault - F 1 Shot"
+    },
+    {
+      "id": "serial_log_20260618_115739",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:57:39.671-05:00",
+      "finished_at": "2026-06-18T11:57:44.389-05:00",
+      "title": "serial_log_20260618_115739",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_115739.json",
+      "viewer_file": "serial_log_20260618_115739_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "8",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-4",
+      "next_test_id": "test-5",
+      "position_label": "10 min after Fault - F 1 Shot / 5 min before Temp Normal"
+    },
+    {
+      "id": "serial_log_20260618_120241",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:02:41.732-05:00",
+      "finished_at": "2026-06-18T12:02:46.374-05:00",
+      "title": "serial_log_20260618_120241",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_120241.json",
+      "viewer_file": "serial_log_20260618_120241_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "8",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-4",
+      "next_test_id": "test-5",
+      "position_label": "15 min after Fault - F 1 Shot / 0 min before Temp Normal"
+    },
+    {
+      "id": "serial_log_20260618_121328",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:13:28.911-05:00",
+      "finished_at": "2026-06-18T12:13:33.814-05:00",
+      "title": "serial_log_20260618_121328",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_121328.json",
+      "viewer_file": "serial_log_20260618_121328_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-5",
+      "next_test_id": "test-6",
+      "position_label": "10 min after Temp Normal / 3 min before 20% Below Fault"
+    },
+    {
+      "id": "serial_log_20260618_121615",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:16:15.774-05:00",
+      "finished_at": "2026-06-18T12:16:20.531-05:00",
+      "title": "serial_log_20260618_121615",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_121615.json",
+      "viewer_file": "serial_log_20260618_121615_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-5",
+      "next_test_id": "test-6",
+      "position_label": "13 min after Temp Normal / 0 min before 20% Below Fault"
+    },
+    {
+      "id": "serial_log_20260618_122701",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:27:01.550-05:00",
+      "finished_at": "2026-06-18T12:27:06.624-05:00",
+      "title": "serial_log_20260618_122701",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_122701.json",
+      "viewer_file": "serial_log_20260618_122701_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-6",
+      "next_test_id": "test-7",
+      "position_label": "10 min after 20% Below Fault / 15 min before Ride Through"
+    },
+    {
+      "id": "serial_log_20260618_124133",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:41:33.210-05:00",
+      "finished_at": "2026-06-18T12:41:38.124-05:00",
+      "title": "serial_log_20260618_124133",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_124133.json",
+      "viewer_file": "serial_log_20260618_124133_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-6",
+      "next_test_id": "test-7",
+      "position_label": "24 min after 20% Below Fault / 0 min before Ride Through"
+    },
+    {
+      "id": "serial_log_20260618_124203",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:42:03.500-05:00",
+      "finished_at": "2026-06-18T12:42:08.438-05:00",
+      "title": "serial_log_20260618_124203",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_124203.json",
+      "viewer_file": "serial_log_20260618_124203_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-6",
+      "next_test_id": "test-7",
+      "position_label": "25 min after 20% Below Fault / 0 min before Ride Through"
+    },
+    {
+      "id": "serial_log_20260618_124934",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:49:34.647-05:00",
+      "finished_at": "2026-06-18T12:49:39.753-05:00",
+      "title": "serial_log_20260618_124934",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_124934.json",
+      "viewer_file": "serial_log_20260618_124934_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-7",
+      "next_test_id": "test-8",
+      "position_label": "7 min after Ride Through / 5 min before Inrush Energize"
+    },
+    {
+      "id": "serial_log_20260618_125415",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:54:15.024-05:00",
+      "finished_at": "2026-06-18T12:54:20.049-05:00",
+      "title": "serial_log_20260618_125415",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_125415.json",
+      "viewer_file": "serial_log_20260618_125415_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-7",
+      "next_test_id": "test-8",
+      "position_label": "11 min after Ride Through / 0 min before Inrush Energize"
+    },
+    {
+      "id": "serial_log_20260618_130138",
+      "kind": "log",
+      "timestamp": "2026-06-18T13:01:38.662-05:00",
+      "finished_at": "2026-06-18T13:01:43.739-05:00",
+      "title": "serial_log_20260618_130138",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_130138.json",
+      "viewer_file": "serial_log_20260618_130138_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-8",
+      "next_test_id": "test-9",
+      "position_label": "6 min after Inrush Energize / 55 min before Inrush Reclose 1"
+    },
+    {
+      "id": "serial_log_20260618_140454",
+      "kind": "log",
+      "timestamp": "2026-06-18T14:04:54.373-05:00",
+      "finished_at": "2026-06-18T14:04:59.401-05:00",
+      "title": "serial_log_20260618_140454",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_140454.json",
+      "viewer_file": "serial_log_20260618_140454_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-9",
+      "next_test_id": "test-10",
+      "position_label": "8 min after Inrush Reclose 1 / 1 min before Inrush Reclose 2"
+    },
+    {
+      "id": "serial_log_20260618_141439",
+      "kind": "log",
+      "timestamp": "2026-06-18T14:14:39.813-05:00",
+      "finished_at": "2026-06-18T14:14:44.818-05:00",
+      "title": "serial_log_20260618_141439",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_141439.json",
+      "viewer_file": "serial_log_20260618_141439_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-10",
+      "next_test_id": "test-11",
+      "position_label": "8 min after Inrush Reclose 2 / 1 min before Large Load Kickin"
+    },
+    {
+      "id": "serial_log_20260618_142504",
+      "kind": "log",
+      "timestamp": "2026-06-18T14:25:04.738-05:00",
+      "finished_at": "2026-06-18T14:25:09.759-05:00",
+      "title": "serial_log_20260618_142504",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_142504.json",
+      "viewer_file": "serial_log_20260618_142504_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-11",
+      "next_test_id": "",
+      "position_label": "8 min after Large Load Kickin"
+    }
+  ],
+  "events": [
+    {
+      "id": "serial_log_20260618_102925",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:29:25.912-05:00",
+      "finished_at": "2026-06-18T10:29:28.285-05:00",
+      "title": "serial_log_20260618_102925",
+      "test_suite": "",
+      "file": "serial_log_20260618_102925.json",
+      "viewer_file": "serial_log_20260618_102925_viewer.html",
+      "commands": [
+        "con",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "17 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_103429",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:34:29.213-05:00",
+      "finished_at": "2026-06-18T10:34:31.599-05:00",
+      "title": "serial_log_20260618_103429",
+      "test_suite": "",
+      "file": "serial_log_20260618_103429.json",
+      "viewer_file": "serial_log_20260618_103429_viewer.html",
+      "commands": [
+        "con",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "12 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_103540",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:35:40.849-05:00",
+      "finished_at": "2026-06-18T10:35:45.014-05:00",
+      "title": "serial_log_20260618_103540",
+      "test_suite": "",
+      "file": "serial_log_20260618_103540.json",
+      "viewer_file": "serial_log_20260618_103540_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "",
+          "status": "OK",
+          "version": "",
+          "model": "",
+          "state": "",
+          "signal": "",
+          "pfault_count": "",
+          "tfault_count": "",
+          "wdt_resets": "",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "11 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_103832",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:38:32.751-05:00",
+      "finished_at": "2026-06-18T10:38:36.941-05:00",
+      "title": "serial_log_20260618_103832",
+      "test_suite": "",
+      "file": "serial_log_20260618_103832.json",
+      "viewer_file": "serial_log_20260618_103832_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "5",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "8 min before SOTF"
+    },
+    {
+      "id": "serial_log_20260618_104607",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:46:07.086-05:00",
+      "finished_at": "2026-06-18T10:46:11.261-05:00",
+      "title": "serial_log_20260618_104607",
+      "test_suite": "",
+      "file": "serial_log_20260618_104607.json",
+      "viewer_file": "serial_log_20260618_104607_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "5",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "0",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "",
+      "next_test_id": "test-1",
+      "position_label": "0 min before SOTF"
+    },
+    {
+      "id": "test-1",
+      "kind": "test",
+      "timestamp": "2026-06-18T10:46:57-05:00",
+      "title": "SOTF",
+      "expected_result": "Red, SOTF, Permanent",
+      "device_results": {
+        "16169005780312": "red, SOTF, Permanent",
+        "16169005769844": "red, SOTF, Permanent",
+        "16169005782524": "red, SOTF, Permanent",
+        "16169005770891": "red, SOTF, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_105239",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:52:39.258-05:00",
+      "finished_at": "2026-06-18T10:52:43.592-05:00",
+      "title": "serial_log_20260618_105239",
+      "test_suite": "",
+      "file": "serial_log_20260618_105239.json",
+      "viewer_file": "serial_log_20260618_105239_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "3",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "7",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-1",
+      "next_test_id": "test-2",
+      "position_label": "5 min after SOTF / 2 min before SM Load Fault"
+    },
+    {
+      "id": "serial_log_20260618_105412",
+      "kind": "log",
+      "timestamp": "2026-06-18T10:54:12.945-05:00",
+      "finished_at": "2026-06-18T10:54:17.156-05:00",
+      "title": "serial_log_20260618_105412",
+      "test_suite": "",
+      "file": "serial_log_20260618_105412.json",
+      "viewer_file": "serial_log_20260618_105412_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "3",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "7",
+          "pfault_count": "1",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-1",
+      "next_test_id": "test-2",
+      "position_label": "7 min after SOTF / 0 min before SM Load Fault"
+    },
+    {
+      "id": "test-2",
+      "kind": "test",
+      "timestamp": "2026-06-18T10:55:08-05:00",
+      "title": "SM Load Fault",
+      "expected_result": "Red, SOTF, Permanent",
+      "device_results": {
+        "16169005780312": "red, SOTF, Permanent",
+        "16169005769844": "red, SOTF, Permanent",
+        "16169005782524": "red, SOTF, Permanent",
+        "16169005770891": "red, SOTF, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_110233",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:02:33.680-05:00",
+      "finished_at": "2026-06-18T11:02:38.102-05:00",
+      "title": "serial_log_20260618_110233",
+      "test_suite": "",
+      "file": "serial_log_20260618_110233.json",
+      "viewer_file": "serial_log_20260618_110233_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-2",
+      "next_test_id": "test-3",
+      "position_label": "7 min after SM Load Fault / 21 min before High Impedance"
+    },
+    {
+      "id": "serial_log_20260618_112325",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:23:25.474-05:00",
+      "finished_at": "2026-06-18T11:23:29.728-05:00",
+      "title": "serial_log_20260618_112325",
+      "test_suite": "",
+      "file": "serial_log_20260618_112325.json",
+      "viewer_file": "serial_log_20260618_112325_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "2",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-2",
+      "next_test_id": "test-3",
+      "position_label": "28 min after SM Load Fault / 0 min before High Impedance"
+    },
+    {
+      "id": "test-3",
+      "kind": "test",
+      "timestamp": "2026-06-18T11:24:01-05:00",
+      "title": "High Impedance",
+      "expected_result": "Red, PFault, Permanent",
+      "device_results": {
+        "16169005780312": "red, PFault, Permanent",
+        "16169005769844": "red, PFault, Permanent",
+        "16169005782524": "red, PFault, Permanent",
+        "16169005770891": "red, PFault, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_113112",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:31:12.394-05:00",
+      "finished_at": "2026-06-18T11:31:16.903-05:00",
+      "title": "serial_log_20260618_113112",
+      "test_suite": "",
+      "file": "serial_log_20260618_113112.json",
+      "viewer_file": "serial_log_20260618_113112_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "16",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "19",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "16",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-3",
+      "next_test_id": "test-4",
+      "position_label": "7 min after High Impedance / 16 min before Fault - F 1 Shot"
+    },
+    {
+      "id": "serial_log_20260618_113738",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:37:38.856-05:00",
+      "finished_at": "2026-06-18T11:37:43.343-05:00",
+      "title": "serial_log_20260618_113738",
+      "test_suite": "",
+      "file": "serial_log_20260618_113738.json",
+      "viewer_file": "serial_log_20260618_113738_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "19",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-3",
+      "next_test_id": "test-4",
+      "position_label": "13 min after High Impedance / 9 min before Fault - F 1 Shot"
+    },
+    {
+      "id": "serial_log_20260618_114421",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:44:21.070-05:00",
+      "finished_at": "2026-06-18T11:44:25.493-05:00",
+      "title": "serial_log_20260618_114421",
+      "test_suite": "",
+      "file": "serial_log_20260618_114421.json",
+      "viewer_file": "serial_log_20260618_114421_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "17",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "19",
+          "pfault_count": "3",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-3",
+      "next_test_id": "test-4",
+      "position_label": "20 min after High Impedance / 3 min before Fault - F 1 Shot"
+    },
+    {
+      "id": "test-4",
+      "kind": "test",
+      "timestamp": "2026-06-18T11:47:31-05:00",
+      "title": "Fault - F 1 Shot",
+      "expected_result": "Red, PFault, Permanent",
+      "device_results": {
+        "16169005780312": "red, PFault, Permanent",
+        "16169005769844": "red, PFault, Permanent",
+        "16169005782524": "red, PFault, Permanent",
+        "16169005770891": "red, PFault, Permanent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_115739",
+      "kind": "log",
+      "timestamp": "2026-06-18T11:57:39.671-05:00",
+      "finished_at": "2026-06-18T11:57:44.389-05:00",
+      "title": "serial_log_20260618_115739",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_115739.json",
+      "viewer_file": "serial_log_20260618_115739_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "8",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-4",
+      "next_test_id": "test-5",
+      "position_label": "10 min after Fault - F 1 Shot / 5 min before Temp Normal"
+    },
+    {
+      "id": "serial_log_20260618_120241",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:02:41.732-05:00",
+      "finished_at": "2026-06-18T12:02:46.374-05:00",
+      "title": "serial_log_20260618_120241",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_120241.json",
+      "viewer_file": "serial_log_20260618_120241_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "8",
+          "pfault_count": "4",
+          "tfault_count": "0",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-4",
+      "next_test_id": "test-5",
+      "position_label": "15 min after Fault - F 1 Shot / 0 min before Temp Normal"
+    },
+    {
+      "id": "test-5",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:03:03-05:00",
+      "title": "Temp Normal",
+      "expected_result": "Red Yellow Yellow, TFault, Temporary",
+      "device_results": {
+        "16169005780312": "RYY, TFault, Temporary",
+        "16169005769844": "RYY, TFault, Temporary",
+        "16169005782524": "RYY, TFault, Temporary",
+        "16169005770891": "RYY, TFault, Temporary"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_121328",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:13:28.911-05:00",
+      "finished_at": "2026-06-18T12:13:33.814-05:00",
+      "title": "serial_log_20260618_121328",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_121328.json",
+      "viewer_file": "serial_log_20260618_121328_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-5",
+      "next_test_id": "test-6",
+      "position_label": "10 min after Temp Normal / 3 min before 20% Below Fault"
+    },
+    {
+      "id": "serial_log_20260618_121615",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:16:15.774-05:00",
+      "finished_at": "2026-06-18T12:16:20.531-05:00",
+      "title": "serial_log_20260618_121615",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_121615.json",
+      "viewer_file": "serial_log_20260618_121615_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "14",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "4",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-5",
+      "next_test_id": "test-6",
+      "position_label": "13 min after Temp Normal / 0 min before 20% Below Fault"
+    },
+    {
+      "id": "test-6",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:16:38-05:00",
+      "title": "20% Below Fault",
+      "expected_result": "Red, PFault, Permanent",
+      "device_results": {
+        "16169005780312": "red, <50 Fault\nPFault, PTF-LL",
+        "16169005769844": "red, <50 Fault\nPFault, PTF-LL",
+        "16169005782524": "red, <50 Fault\nPFault, PTF-LL",
+        "16169005770891": "red, <50 Fault\nPFault, PTF-LL"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_122701",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:27:01.550-05:00",
+      "finished_at": "2026-06-18T12:27:06.624-05:00",
+      "title": "serial_log_20260618_122701",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_122701.json",
+      "viewer_file": "serial_log_20260618_122701_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-6",
+      "next_test_id": "test-7",
+      "position_label": "10 min after 20% Below Fault / 15 min before Ride Through"
+    },
+    {
+      "id": "serial_log_20260618_124133",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:41:33.210-05:00",
+      "finished_at": "2026-06-18T12:41:38.124-05:00",
+      "title": "serial_log_20260618_124133",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_124133.json",
+      "viewer_file": "serial_log_20260618_124133_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-6",
+      "next_test_id": "test-7",
+      "position_label": "24 min after 20% Below Fault / 0 min before Ride Through"
+    },
+    {
+      "id": "serial_log_20260618_124203",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:42:03.500-05:00",
+      "finished_at": "2026-06-18T12:42:08.438-05:00",
+      "title": "serial_log_20260618_124203",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_124203.json",
+      "viewer_file": "serial_log_20260618_124203_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-6",
+      "next_test_id": "test-7",
+      "position_label": "25 min after 20% Below Fault / 0 min before Ride Through"
+    },
+    {
+      "id": "test-7",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:42:20-05:00",
+      "title": "Ride Through",
+      "expected_result": "None, Fault Like , None",
+      "device_results": {
+        "16169005780312": "none, Fault Like, none",
+        "16169005769844": "none, Fault Like, none",
+        "16169005782524": "none, Fault Like, none",
+        "16169005770891": "none, Fault Like, none"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_124934",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:49:34.647-05:00",
+      "finished_at": "2026-06-18T12:49:39.753-05:00",
+      "title": "serial_log_20260618_124934",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_124934.json",
+      "viewer_file": "serial_log_20260618_124934_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-7",
+      "next_test_id": "test-8",
+      "position_label": "7 min after Ride Through / 5 min before Inrush Energize"
+    },
+    {
+      "id": "serial_log_20260618_125415",
+      "kind": "log",
+      "timestamp": "2026-06-18T12:54:15.024-05:00",
+      "finished_at": "2026-06-18T12:54:20.049-05:00",
+      "title": "serial_log_20260618_125415",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_125415.json",
+      "viewer_file": "serial_log_20260618_125415_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "13",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "12",
+          "pfault_count": "5",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-7",
+      "next_test_id": "test-8",
+      "position_label": "11 min after Ride Through / 0 min before Inrush Energize"
+    },
+    {
+      "id": "test-8",
+      "kind": "test",
+      "timestamp": "2026-06-18T12:54:45-05:00",
+      "title": "Inrush Energize",
+      "expected_result": "None, Fault <50\nSOTF\nCurrent Reset, None (?)",
+      "device_results": {
+        "16169005780312": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset",
+        "16169005769844": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset",
+        "16169005782524": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset",
+        "16169005770891": "none, Fault <50\nSOTF\nCurrent Reset, Probable Cold Load Pickup\nCurrent Reset"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_130138",
+      "kind": "log",
+      "timestamp": "2026-06-18T13:01:38.662-05:00",
+      "finished_at": "2026-06-18T13:01:43.739-05:00",
+      "title": "serial_log_20260618_130138",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_130138.json",
+      "viewer_file": "serial_log_20260618_130138_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-8",
+      "next_test_id": "test-9",
+      "position_label": "6 min after Inrush Energize / 55 min before Inrush Reclose 1"
+    },
+    {
+      "id": "test-9",
+      "kind": "test",
+      "timestamp": "2026-06-18T13:56:43-05:00",
+      "title": "Inrush Reclose 1",
+      "expected_result": "None, None, None",
+      "device_results": {
+        "16169005780312": "None, None, None",
+        "16169005769844": "None, None, None",
+        "16169005782524": "None, None, None",
+        "16169005770891": "None, None, None"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_140454",
+      "kind": "log",
+      "timestamp": "2026-06-18T14:04:54.373-05:00",
+      "finished_at": "2026-06-18T14:04:59.401-05:00",
+      "title": "serial_log_20260618_140454",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_140454.json",
+      "viewer_file": "serial_log_20260618_140454_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-9",
+      "next_test_id": "test-10",
+      "position_label": "8 min after Inrush Reclose 1 / 1 min before Inrush Reclose 2"
+    },
+    {
+      "id": "test-10",
+      "kind": "test",
+      "timestamp": "2026-06-18T14:06:06-05:00",
+      "title": "Inrush Reclose 2",
+      "expected_result": "None, None, None",
+      "device_results": {
+        "16169005780312": "None, None, None",
+        "16169005769844": "None, None, None",
+        "16169005782524": "None, None, None",
+        "16169005770891": "None, None, None"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_141439",
+      "kind": "log",
+      "timestamp": "2026-06-18T14:14:39.813-05:00",
+      "finished_at": "2026-06-18T14:14:44.818-05:00",
+      "title": "serial_log_20260618_141439",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_141439.json",
+      "viewer_file": "serial_log_20260618_141439_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-10",
+      "next_test_id": "test-11",
+      "position_label": "8 min after Inrush Reclose 2 / 1 min before Large Load Kickin"
+    },
+    {
+      "id": "test-11",
+      "kind": "test",
+      "timestamp": "2026-06-18T14:16:21-05:00",
+      "title": "Large Load Kickin",
+      "expected_result": "None, Fault Like, None",
+      "device_results": {
+        "16169005780312": "None, Fault Like, None",
+        "16169005769844": "None, Fault Like, None",
+        "16169005782524": "None, Fault Like, None",
+        "16169005770891": "None, Fault Like, None"
+      },
+      "notes": ""
+    },
+    {
+      "id": "serial_log_20260618_142504",
+      "kind": "log",
+      "timestamp": "2026-06-18T14:25:04.738-05:00",
+      "finished_at": "2026-06-18T14:25:09.759-05:00",
+      "title": "serial_log_20260618_142504",
+      "test_suite": "102.12 - R15 using 6.64 (Module 3 - Basic Sequences) - 1.01",
+      "file": "serial_log_20260618_142504.json",
+      "viewer_file": "serial_log_20260618_142504_viewer.html",
+      "commands": [
+        "con",
+        "eve",
+        "sta"
+      ],
+      "devices": [
+        {
+          "port": "COM11",
+          "imei": "16169005780312",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "18",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM12",
+          "imei": "16169005769844",
+          "status": "OK",
+          "version": "6.48",
+          "model": "FI-5A-W1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "15",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "2",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM13",
+          "imei": "16169005782524",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "10",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "54",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        },
+        {
+          "port": "COM14",
+          "imei": "16169005770891",
+          "status": "OK",
+          "version": "6.64",
+          "model": "FI-5A-W-1 S04TRB-X",
+          "state": "Sleep",
+          "signal": "11",
+          "pfault_count": "6",
+          "tfault_count": "1",
+          "wdt_resets": "0",
+          "commands": [
+            "con",
+            "sta",
+            "eve"
+          ]
+        }
+      ],
+      "device_count": 4,
+      "error_count": 0,
+      "previous_test_id": "test-11",
+      "next_test_id": "",
+      "position_label": "8 min after Large Load Kickin"
+    }
+  ]
+}

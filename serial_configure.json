@@ -1,0 +1,10 @@
+{
+  "port": "COM11",
+  "baud": 4096,
+  "timeout": 10,
+  "prompt_prefix": "# SGS",
+  "line_ending": "cr",
+  "log_dir": "logs",
+  "apply_commands": ["pfrh 4", "cell 18 0", "crst 0"],
+  "verify_commands": ["con", "sta"]
+}

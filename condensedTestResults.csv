@@ -1,0 +1,30 @@
+Timestamp,Fault test,Expected Result,16169005780312,16169005769844,16169005782524,16169005770891,Notes
+6/18/2026 10:46:57,SOTF,"Red, SOTF, Permanent","red, SOTF, Permanent","red, SOTF, Permanent","red, SOTF, Permanent","red, SOTF, Permanent",
+6/18/2026 10:55:08,SM Load Fault,"Red, SOTF, Permanent","red, SOTF, Permanent","red, SOTF, Permanent","red, SOTF, Permanent","red, SOTF, Permanent",
+6/18/2026 11:24:01,High Impedance,"Red, PFault, Permanent","red, PFault, Permanent","red, PFault, Permanent","red, PFault, Permanent","red, PFault, Permanent",
+6/18/2026 11:47:31,Fault - F 1 Shot,"Red, PFault, Permanent","red, PFault, Permanent","red, PFault, Permanent","red, PFault, Permanent","red, PFault, Permanent",
+6/18/2026 12:03:03,Temp Normal,"Red Yellow Yellow, TFault, Temporary","RYY, TFault, Temporary","RYY, TFault, Temporary","RYY, TFault, Temporary","RYY, TFault, Temporary",
+6/18/2026 12:16:38,20% Below Fault,"Red, PFault, Permanent","red, <50 Fault
+PFault, PTF-LL","red, <50 Fault
+PFault, PTF-LL","red, <50 Fault
+PFault, PTF-LL","red, <50 Fault
+PFault, PTF-LL",
+6/18/2026 12:42:20,Ride Through,"None, Fault Like , None","none, Fault Like, none","none, Fault Like, none","none, Fault Like, none","none, Fault Like, none",
+6/18/2026 12:54:45,Inrush Energize,"None, Fault <50
+SOTF
+Current Reset, None (?)","none, Fault <50
+SOTF
+Current Reset, Probable Cold Load Pickup
+Current Reset","none, Fault <50
+SOTF
+Current Reset, Probable Cold Load Pickup
+Current Reset","none, Fault <50
+SOTF
+Current Reset, Probable Cold Load Pickup
+Current Reset","none, Fault <50
+SOTF
+Current Reset, Probable Cold Load Pickup
+Current Reset",
+6/18/2026 13:56:43,Inrush Reclose 1,"None, None, None","None, None, None","None, None, None","None, None, None","None, None, None",
+6/18/2026 14:06:06,Inrush Reclose 2,"None, None, None","None, None, None","None, None, None","None, None, None","None, None, None",
+6/18/2026 14:16:21,Large Load Kickin,"None, Fault Like, None","None, Fault Like, None","None, Fault Like, None","None, Fault Like, None","None, Fault Like, None",

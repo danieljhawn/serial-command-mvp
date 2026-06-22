@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Serial Timeline Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1b1f24;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #1f6feb;
+      --test: #7a42c6;
+      --log: #0969da;
+      --ok: #137333;
+      --bad: #b42318;
+      --code: #f1f4f8;
+      --shadow: rgba(15, 23, 42, 0.16);
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #0f1115;
+      --panel: #171b22;
+      --text: #e7eaf0;
+      --muted: #9aa4b2;
+      --line: #303846;
+      --accent: #7aa7ff;
+      --test: #c8a6ff;
+      --log: #85b7ff;
+      --ok: #72d391;
+      --bad: #ff8a80;
+      --code: #10141b;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      backdrop-filter: blur(8px);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) auto;
+      gap: 10px 16px;
+      align-items: start;
+      padding: 10px 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .actions,
+    .filters,
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .actions {
+      justify-content: flex-end;
+    }
+
+    .filters {
+      grid-column: 1 / -1;
+      justify-content: space-between;
+    }
+
+    button,
+    select,
+    input {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 0 10px;
+    }
+
+    select,
+    input {
+      padding: 0 8px;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+      gap: 12px;
+      padding: 12px;
+      align-items: start;
+    }
+
+    main.focus {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    main.focus #detailPanel {
+      display: none;
+    }
+
+    .timeline-panel,
+    .detail-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    .panel-title {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      font-weight: 750;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .timeline-scroll {
+      overflow-x: auto;
+      padding: 10px;
+    }
+
+    .timeline {
+      position: relative;
+      min-width: 1200px;
+      height: 420px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(to right, color-mix(in srgb, var(--line) 36%, transparent) 1px, transparent 1px),
+        color-mix(in srgb, var(--panel) 88%, var(--code));
+      background-size: var(--grid-step, 120px) 100%;
+    }
+
+    .axis {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .test-axis {
+      top: 132px;
+    }
+
+    .log-axis {
+      top: 286px;
+    }
+
+    .lane-label {
+      position: absolute;
+      left: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      border: 1px solid var(--line);
+    }
+
+    .test-label {
+      top: 104px;
+    }
+
+    .log-label {
+      top: 258px;
+    }
+
+    .tick {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: color-mix(in srgb, var(--line) 55%, transparent);
+    }
+
+    .tick span {
+      position: absolute;
+      top: 8px;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .marker {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--panel);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px var(--shadow);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .marker.test {
+      background: var(--test);
+    }
+
+    .marker.log {
+      background: var(--log);
+    }
+
+    .marker.error {
+      outline: 2px solid var(--bad);
+    }
+
+    .marker.selected {
+      width: 30px;
+      height: 30px;
+      outline: 3px solid var(--accent);
+      z-index: 4;
+    }
+
+    .marker:hover {
+      z-index: 5;
+    }
+
+    .quickview {
+      position: fixed;
+      z-index: 20;
+      max-width: 360px;
+      pointer-events: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: var(--panel);
+      box-shadow: 0 12px 32px var(--shadow);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 80ms ease, transform 80ms ease;
+    }
+
+    .quickview.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .quick-title {
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .quick-time,
+    .quick-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .detail-panel {
+      position: sticky;
+      top: 116px;
+      max-height: calc(100vh - 132px);
+      overflow: auto;
+    }
+
+    .detail-body {
+      padding: 10px;
+    }
+
+    .detail-empty {
+      color: var(--muted);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .time {
+      color: var(--muted);
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+    }
+
+    .title {
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: var(--code);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill.ok {
+      background: color-mix(in srgb, var(--ok) 18%, transparent);
+      color: var(--ok);
+    }
+
+    .pill.error {
+      background: color-mix(in srgb, var(--bad) 18%, transparent);
+      color: var(--bad);
+    }
+
+    .device-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 6px;
+    }
+
+    .device {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px;
+      background: color-mix(in srgb, var(--panel) 88%, var(--code));
+    }
+
+    .device-name {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .device-value {
+      margin-top: 3px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 750;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1000px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-panel {
+        position: static;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>Serial Timeline Report</h1>
+        <div id="subtitle" class="subtitle">Loading timeline data...</div>
+      </div>
+      <div class="actions">
+        <button id="themeToggle" type="button">Dark Mode</button>
+      </div>
+      <div class="filters">
+        <div class="filter-group">
+          <label>
+            Layout
+            <select id="layoutMode">
+              <option value="split">Split Detail</option>
+              <option value="wide">Wide Timeline</option>
+            </select>
+          </label>
+          <label>
+            Device
+            <select id="deviceFilter">
+              <option value="">All Devices</option>
+            </select>
+          </label>
+          <label>
+            Search
+            <input id="searchInput" type="search" placeholder="fault, IMEI, note...">
+          </label>
+        </div>
+        <div class="filter-group">
+          <button id="showAll" type="button">Show All</button>
+          <button id="testWindow" type="button">Test Window</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="app">
+    <section class="timeline-panel">
+      <div class="panel-title">
+        <span>Scaled Timeline</span>
+        <span id="timelineCount" class="count"></span>
+      </div>
+      <div class="timeline-scroll">
+        <div id="timeline" class="timeline"></div>
+      </div>
+    </section>
+    <aside id="detailPanel" class="detail-panel">
+      <div class="panel-title">
+        <span>Selected Event</span>
+        <span class="count">click a marker</span>
+      </div>
+      <div id="detailBody" class="detail-body detail-empty">Hover a marker for a quickview. Click one to expand the details here.</div>
+    </aside>
+  </main>
+  <div id="quickview" class="quickview"></div>
+
+  <script>
+    // TIMELINE_DATA
+    const app = document.getElementById("app");
+    const subtitle = document.getElementById("subtitle");
+    const layoutMode = document.getElementById("layoutMode");
+    const deviceFilter = document.getElementById("deviceFilter");
+    const searchInput = document.getElementById("searchInput");
+    const themeToggle = document.getElementById("themeToggle");
+    const showAll = document.getElementById("showAll");
+    const testWindow = document.getElementById("testWindow");
+    const timeline = document.getElementById("timeline");
+    const timelineCount = document.getElementById("timelineCount");
+    const detailBody = document.getElementById("detailBody");
+    const quickview = document.getElementById("quickview");
+    let restrictToTestWindow = false;
+    let selectedEventId = "";
+
+    applyTheme(localStorage.getItem("serialTimelineTheme") || "light");
+
+    layoutMode.addEventListener("change", () => {
+      app.classList.toggle("focus", layoutMode.value === "wide");
+      render();
+    });
+    deviceFilter.addEventListener("change", render);
+    searchInput.addEventListener("input", render);
+    showAll.addEventListener("click", () => {
+      restrictToTestWindow = false;
+      render();
+    });
+    testWindow.addEventListener("click", () => {
+      restrictToTestWindow = true;
+      render();
+    });
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = document.body.classList.contains("dark") ? "light" : "dark";
+      applyTheme(nextTheme);
+      localStorage.setItem("serialTimelineTheme", nextTheme);
+    });
+
+    if (window.TIMELINE_DATA) {
+      initialize();
+    } else {
+      timeline.innerHTML = `<div class="detail-empty">No embedded timeline data found. Run build_timeline.py to generate timeline_report.html.</div>`;
+    }
+
+    function initialize() {
+      populateDeviceFilter();
+      render();
+    }
+
+    function render() {
+      const events = filteredEvents();
+      const bounds = timelineBounds(events);
+      subtitle.textContent = `${countKind(events, "test")} tests | ${countKind(events, "log")} serial logs | ${formatDate(bounds.start)} to ${formatDate(bounds.end)}`;
+      timelineCount.textContent = `${events.length} events`;
+      renderTimeline(events, bounds);
+      if (selectedEventId) {
+        const selected = events.find(event => event.id === selectedEventId);
+        if (selected) {
+          renderDetail(selected);
+        } else {
+          selectedEventId = "";
+          clearDetail();
+        }
+      }
+    }
+
+    function renderTimeline(events, bounds) {
+      timeline.innerHTML = "";
+      const duration = Math.max(1, bounds.end - bounds.start);
+      const width = Math.max(1200, Math.round(duration / 60000) * 10);
+      timeline.style.width = `${width}px`;
+      timeline.style.setProperty("--grid-step", `${Math.max(80, width / 10)}px`);
+      addAxis("test-axis");
+      addAxis("log-axis");
+      addLaneLabel("Tests", "test-label");
+      addLaneLabel("Serial Logs", "log-label");
+      addTicks(bounds, width);
+
+      const laneOffsets = { test: 132, log: 286 };
+      const stacks = {};
+      events.forEach(event => {
+        const x = 28 + ((new Date(event.timestamp).getTime() - bounds.start) / duration) * (width - 56);
+        const stackKey = `${event.kind}-${Math.round(x / 24)}`;
+        const stackIndex = stacks[stackKey] || 0;
+        stacks[stackKey] = stackIndex + 1;
+        const y = laneOffsets[event.kind] + ((stackIndex % 5) - 2) * 22;
+        timeline.appendChild(renderMarker(event, x, y));
+      });
+    }
+
+    function renderMarker(event, x, y) {
+      const marker = document.createElement("button");
+      marker.type = "button";
+      marker.className = `marker ${event.kind}`;
+      if (event.error_count) {
+        marker.classList.add("error");
+      }
+      if (event.id === selectedEventId) {
+        marker.classList.add("selected");
+      }
+      marker.style.left = `${x}px`;
+      marker.style.top = `${y}px`;
+      marker.textContent = event.kind === "test" ? "T" : "L";
+      marker.setAttribute("aria-label", `${event.kind}: ${event.title}`);
+      marker.addEventListener("mouseenter", mouseEvent => showQuickview(event, mouseEvent));
+      marker.addEventListener("mousemove", moveQuickview);
+      marker.addEventListener("mouseleave", hideQuickview);
+      marker.addEventListener("click", () => {
+        selectedEventId = event.id;
+        renderDetail(event);
+        render();
+      });
+      return marker;
+    }
+
+    function addAxis(className) {
+      const axis = document.createElement("div");
+      axis.className = `axis ${className}`;
+      timeline.appendChild(axis);
+    }
+
+    function addLaneLabel(text, className) {
+      const label = document.createElement("div");
+      label.className = `lane-label ${className}`;
+      label.textContent = text;
+      timeline.appendChild(label);
+    }
+
+    function addTicks(bounds, width) {
+      const tickCount = 10;
+      for (let index = 0; index <= tickCount; index += 1) {
+        const x = 28 + (index / tickCount) * (width - 56);
+        const time = new Date(bounds.start + (index / tickCount) * (bounds.end - bounds.start));
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        tick.style.left = `${x}px`;
+        const label = document.createElement("span");
+        label.textContent = time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        tick.appendChild(label);
+        timeline.appendChild(tick);
+      }
+    }
+
+    function renderDetail(event) {
+      detailBody.className = "detail-body";
+      if (event.kind === "test") {
+        detailBody.innerHTML = `
+          <div class="time"></div>
+          <div class="title"></div>
+          <div class="pill-row"></div>
+          <div class="device-grid"></div>
+        `;
+        detailBody.querySelector(".time").textContent = formatDate(event.timestamp);
+        detailBody.querySelector(".title").textContent = event.title || "Untitled test";
+        const pills = detailBody.querySelector(".pill-row");
+        addPill(pills, "test");
+        addPill(pills, `Expected: ${event.expected_result || "n/a"}`);
+        if (event.notes) {
+          addPill(pills, `Notes: ${event.notes}`);
+        }
+        const grid = detailBody.querySelector(".device-grid");
+        Object.entries(event.device_results || {}).forEach(([imei, result]) => {
+          grid.appendChild(renderDeviceValue(imei, result));
+        });
+        return;
+      }
+
+      detailBody.innerHTML = `
+        <div class="time"></div>
+        <div class="title"></div>
+        <div class="pill-row"></div>
+        <div class="device-grid"></div>
+      `;
+      detailBody.querySelector(".time").textContent = `${formatDate(event.timestamp)} to ${formatDate(event.finished_at)}`;
+      detailBody.querySelector(".title").textContent = event.title;
+      const pills = detailBody.querySelector(".pill-row");
+      addPill(pills, event.error_count ? `${event.error_count} errors` : "OK", event.error_count ? "error" : "ok");
+      addPill(pills, event.position_label || "unmatched");
+      addPill(pills, `Commands: ${(event.commands || []).join(", ")}`);
+      if (event.viewer_file) {
+        const link = document.createElement("a");
+        link.href = `logs/${event.viewer_file}`;
+        link.textContent = "open full log viewer";
+        pills.appendChild(link);
+      }
+      const grid = detailBody.querySelector(".device-grid");
+      (event.devices || []).forEach(device => {
+        grid.appendChild(renderDeviceValue(
+          device.imei || device.port,
+          [
+            device.port,
+            device.status,
+            device.state ? `State: ${device.state}` : "",
+            device.signal ? `Signal: ${device.signal}` : "",
+            device.pfault_count ? `PFault: ${device.pfault_count}` : "",
+            device.tfault_count ? `TFault: ${device.tfault_count}` : "",
+            device.wdt_resets ? `WDT: ${device.wdt_resets}` : "",
+          ].filter(Boolean).join("\n")
+        ));
+      });
+    }
+
+    function clearDetail() {
+      detailBody.className = "detail-body detail-empty";
+      detailBody.textContent = "Hover a marker for a quickview. Click one to expand the details here.";
+    }
+
+    function showQuickview(event, mouseEvent) {
+      quickview.innerHTML = `
+        <div class="quick-title"></div>
+        <div class="quick-time"></div>
+        <div class="quick-meta"></div>
+      `;
+      quickview.querySelector(".quick-title").textContent = event.title || event.kind;
+      quickview.querySelector(".quick-time").textContent = formatDate(event.timestamp);
+      quickview.querySelector(".quick-meta").textContent = quickText(event);
+      quickview.classList.add("visible");
+      moveQuickview(mouseEvent);
+    }
+
+    function moveQuickview(mouseEvent) {
+      const padding = 14;
+      const rect = quickview.getBoundingClientRect();
+      let left = mouseEvent.clientX + padding;
+      let top = mouseEvent.clientY + padding;
+      if (left + rect.width > window.innerWidth - padding) {
+        left = mouseEvent.clientX - rect.width - padding;
+      }
+      if (top + rect.height > window.innerHeight - padding) {
+        top = mouseEvent.clientY - rect.height - padding;
+      }
+      quickview.style.left = `${Math.max(padding, left)}px`;
+      quickview.style.top = `${Math.max(padding, top)}px`;
+    }
+
+    function hideQuickview() {
+      quickview.classList.remove("visible");
+    }
+
+    function quickText(event) {
+      if (event.kind === "test") {
+        return `Expected: ${event.expected_result || "n/a"}`;
+      }
+      return `${event.position_label || "unmatched"} | ${(event.commands || []).join(", ")} | ${event.device_count || 0} devices`;
+    }
+
+    function renderDeviceValue(name, value) {
+      const node = document.createElement("div");
+      node.className = "device";
+      node.innerHTML = `<div class="device-name"></div><div class="device-value"></div>`;
+      node.querySelector(".device-name").textContent = name;
+      node.querySelector(".device-value").textContent = value || "n/a";
+      return node;
+    }
+
+    function addPill(parent, text, className = "") {
+      const node = document.createElement("span");
+      node.className = `pill ${className}`.trim();
+      node.textContent = text;
+      parent.appendChild(node);
+    }
+
+    function filteredEvents() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedDevice = deviceFilter.value;
+      const windowBounds = getTestWindow();
+      return (window.TIMELINE_DATA.events || []).filter(event => {
+        if (restrictToTestWindow && windowBounds) {
+          const time = new Date(event.timestamp).getTime();
+          if (time < windowBounds.start || time > windowBounds.end) {
+            return false;
+          }
+        }
+        if (selectedDevice && !eventHasDevice(event, selectedDevice)) {
+          return false;
+        }
+        if (!query) {
+          return true;
+        }
+        return JSON.stringify(event).toLowerCase().includes(query);
+      });
+    }
+
+    function eventHasDevice(event, imei) {
+      if (event.kind === "test") {
+        return imei in (event.device_results || {});
+      }
+      return (event.devices || []).some(device => device.imei === imei);
+    }
+
+    function timelineBounds(events) {
+      const source = events.length ? events : window.TIMELINE_DATA.events || [];
+      const times = source.map(event => new Date(event.timestamp).getTime()).filter(Number.isFinite);
+      if (!times.length) {
+        const now = Date.now();
+        return { start: now - 1, end: now + 1 };
+      }
+      const start = Math.min(...times);
+      const end = Math.max(...times);
+      const padding = Math.max(5 * 60 * 1000, (end - start) * 0.04);
+      return { start: start - padding, end: end + padding };
+    }
+
+    function getTestWindow() {
+      const tests = window.TIMELINE_DATA.tests || [];
+      const times = tests.map(test => new Date(test.timestamp).getTime()).filter(Number.isFinite);
+      if (!times.length) {
+        return null;
+      }
+      return {
+        start: Math.min(...times) - 15 * 60 * 1000,
+        end: Math.max(...times) + 20 * 60 * 1000,
+      };
+    }
+
+    function populateDeviceFilter() {
+      const devices = new Set();
+      for (const test of window.TIMELINE_DATA.tests || []) {
+        Object.keys(test.device_results || {}).forEach(imei => devices.add(imei));
+      }
+      for (const log of window.TIMELINE_DATA.logs || []) {
+        for (const device of log.devices || []) {
+          if (device.imei) {
+            devices.add(device.imei);
+          }
+        }
+      }
+      [...devices].sort().forEach(imei => {
+        const option = document.createElement("option");
+        option.value = imei;
+        option.textContent = imei;
+        deviceFilter.appendChild(option);
+      });
+    }
+
+    function countKind(events, kind) {
+      return events.filter(event => event.kind === kind).length;
+    }
+
+    function applyTheme(theme) {
+      const dark = theme === "dark";
+      document.body.classList.toggle("dark", dark);
+      themeToggle.textContent = dark ? "Light Mode" : "Dark Mode";
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "n/a";
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+      return date.toLocaleString();
+    }
+  </script>
+</body>
+</html>
