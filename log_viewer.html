@@ -69,6 +69,20 @@
       font-weight: 700;
     }
 
+    h2 {
+      margin: 4px 0 0;
+      overflow-wrap: anywhere;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .sequence-duration {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .subtitle {
       margin-top: 3px;
       color: var(--muted);
@@ -163,6 +177,8 @@
 
     .device {
       overflow: hidden;
+      width: fit-content;
+      max-width: calc(100vw - 24px);
     }
 
     #devices {
@@ -170,6 +186,7 @@
       grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
       gap: 10px;
       align-items: start;
+      justify-content: start;
     }
 
     summary {
@@ -335,6 +352,8 @@
     <div class="topbar">
       <div>
         <h1 id="pageTitle">Serial Log Viewer</h1>
+        <h2 id="pageSequence" class="hidden"></h2>
+        <div id="pageSequenceDuration" class="sequence-duration hidden"></div>
         <div id="pageTimestamp" class="subtitle">Choose a serial log JSON file.</div>
       </div>
       <div class="header-actions">
@@ -357,6 +376,10 @@
               <option value="lines">Lines first</option>
             </select>
           </label>
+          <label>
+            <input id="showFields" type="checkbox" checked>
+            Show fields
+          </label>
         </div>
         <div>
           <button id="expandAll" type="button">Expand All</button>
@@ -375,12 +398,15 @@
     // SERIAL_LOG_DATA
     const fileInput = document.getElementById("fileInput");
     const pageTitle = document.getElementById("pageTitle");
+    const pageSequence = document.getElementById("pageSequence");
+    const pageSequenceDuration = document.getElementById("pageSequenceDuration");
     const pageTimestamp = document.getElementById("pageTimestamp");
     const emptyState = document.getElementById("emptyState");
     const summary = document.getElementById("summary");
     const toolbar = document.getElementById("toolbar");
     const commandFilter = document.getElementById("commandFilter");
     const viewMode = document.getElementById("viewMode");
+    const showFields = document.getElementById("showFields");
     const devicesContainer = document.getElementById("devices");
     const expandAll = document.getElementById("expandAll");
     const collapseAll = document.getElementById("collapseAll");
@@ -388,6 +414,7 @@
     let currentLog = null;
 
     applyTheme(localStorage.getItem("serialLogViewerTheme") || "light");
+    showFields.checked = localStorage.getItem("serialLogViewerShowFields") !== "false";
 
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
@@ -410,6 +437,11 @@
 
     commandFilter.addEventListener("change", () => renderDevices(currentLog));
     viewMode.addEventListener("change", () => renderDevices(currentLog));
+    showFields.addEventListener("change", () => {
+      localStorage.setItem("serialLogViewerShowFields", String(showFields.checked));
+      renderDevices(currentLog);
+    });
+    window.addEventListener("resize", () => updateDeviceGridColumns());
     expandAll.addEventListener("click", () => setAllDetails(true));
     collapseAll.addEventListener("click", () => setAllDetails(false));
     themeToggle.addEventListener("click", () => {
@@ -436,21 +468,66 @@
 
     function renderHeader(log) {
       const testSuite = log.test_suite || log.settings?.test_suite || "Serial Log Viewer";
+      const selectedSequence = log.selected_sequence || {};
       pageTitle.textContent = testSuite;
+      if (selectedSequence.name) {
+        pageSequence.textContent = selectedSequence.name;
+        pageSequence.classList.remove("hidden");
+        pageSequenceDuration.textContent = selectedSequence.value
+          ? `Duration: ${formatDuration(calculateSequenceDurationSeconds(selectedSequence.value))} | ${selectedSequence.value}`
+          : "";
+        pageSequenceDuration.classList.toggle("hidden", !selectedSequence.value);
+      } else {
+        pageSequence.textContent = "";
+        pageSequence.classList.add("hidden");
+        pageSequenceDuration.textContent = "";
+        pageSequenceDuration.classList.add("hidden");
+      }
       pageTimestamp.textContent = `Started ${formatDate(log.started_at)}${log.finished_at ? ` | Finished ${formatDate(log.finished_at)}` : ""}`;
       document.title = testSuite;
     }
 
+    function calculateSequenceDurationSeconds(sequenceText) {
+      const tokens = String(sequenceText || "").trim().split(/\s+/);
+      let totalSeconds = 0;
+
+      for (let index = 0; index < tokens.length; index += 2) {
+        const durationToken = tokens[index];
+        const match = durationToken.match(/^(\d+(?:\.\d+)?)(ms|s)$/i);
+        if (!match) {
+          continue;
+        }
+
+        const value = Number(match[1]);
+        const unit = match[2].toLowerCase();
+        totalSeconds += unit === "ms" ? value / 1000 : value;
+      }
+
+      return totalSeconds;
+    }
+
+    function formatDuration(totalSeconds) {
+      if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) {
+        return "n/a";
+      }
+
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds - minutes * 60;
+      if (minutes > 0) {
+        return `${minutes}m ${formatSeconds(seconds)}`;
+      }
+      return formatSeconds(seconds);
+    }
+
+    function formatSeconds(seconds) {
+      const rounded = Math.round(seconds * 1000) / 1000;
+      return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}s`;
+    }
+
     function renderSummary(log) {
       const devices = Object.values(log.devices || {});
-      const commands = devices.flatMap(device => device.commands || []);
       summary.innerHTML = "";
       addMetric("Devices", String(devices.length));
-      addMetric("Commands", String(commands.length));
-      addMetric("Baud", String(log.settings?.baud ?? ""));
-      addMetric("Prompt", String(log.settings?.prompt_prefix ?? ""));
-      addMetric("Timeout", `${log.settings?.timeout ?? ""}s`);
-      addMetric("Log", window.SERIAL_LOG_FILE || "");
     }
 
     function addMetric(label, value) {
@@ -529,12 +606,14 @@
 
         devicesContainer.appendChild(details);
       }
+
+      updateDeviceGridColumns(devices.length);
     }
 
     function renderCommand(command) {
       const details = document.createElement("details");
       details.className = "command";
-      details.open = command.command !== "eve";
+      details.open = true;
       details.innerHTML = `
         <summary>
           <span class="summary-title">
@@ -563,7 +642,9 @@
 
       const fields = renderFields(command.response_fields || {});
       const lines = renderLines(command.response_text || []);
-      if (viewMode.value === "lines") {
+      if (!showFields.checked) {
+        body.appendChild(lines);
+      } else if (viewMode.value === "lines") {
         body.appendChild(lines);
         body.appendChild(fields);
       } else {
@@ -605,6 +686,36 @@
       document.querySelectorAll("details").forEach(details => {
         details.open = open;
       });
+    }
+
+    function updateDeviceGridColumns(deviceCount = null) {
+      const count = deviceCount ?? devicesContainer.children.length;
+      if (!count) {
+        devicesContainer.style.gridTemplateColumns = "";
+        return;
+      }
+
+      const minColumnWidth = 360;
+      const gap = 10;
+      const availableWidth = devicesContainer.clientWidth || window.innerWidth;
+      if (availableWidth < minColumnWidth * 2) {
+        devicesContainer.style.gridTemplateColumns = "1fr";
+        return;
+      }
+
+      const maxColumns = Math.max(1, Math.floor((availableWidth + gap) / (minColumnWidth + gap)));
+      let columns = Math.min(count, maxColumns);
+
+      if (count % 2 === 0 && columns < count) {
+        for (let candidate = columns; candidate >= 1; candidate -= 1) {
+          if (count % candidate === 0) {
+            columns = candidate;
+            break;
+          }
+        }
+      }
+
+      devicesContainer.style.gridTemplateColumns = `repeat(${columns}, minmax(${minColumnWidth}px, max-content))`;
     }
 
     function applyTheme(theme) {

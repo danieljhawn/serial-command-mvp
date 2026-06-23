@@ -12,13 +12,15 @@ from typing import Any
 import serial
 
 
-DEFAULT_CONFIG_PATH = Path(__file__).with_name("serial_config.json")
+DEFAULT_CONFIG_PATH = Path(__file__).with_name("collection_config.json")
 VIEWER_PATH = Path(__file__).with_name("log_viewer.html")
 
 
 @dataclass(frozen=True)
 class SerialConfig:
     test_suite: str
+    selected_sequence_name: str
+    selected_sequence_value: str
     ports: list[str]
     commands: list[str]
     pre_commands: list[str]
@@ -38,9 +40,14 @@ class ThreadSafeJsonLogger:
             "started_at": timestamp(),
             "finished_at": None,
             "test_suite": config.test_suite,
+            "selected_sequence": {
+                "name": config.selected_sequence_name,
+                "value": config.selected_sequence_value,
+            },
             "config_path": str(config_path),
             "settings": {
                 "test_suite": config.test_suite,
+                "selected_sequence": config.selected_sequence_name,
                 "baud": config.baud,
                 "timeout": config.timeout,
                 "prompt_prefix": config.prompt_prefix,
@@ -98,19 +105,42 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Do not generate and open the HTML viewer after polling.",
     )
+    parser.add_argument(
+        "--sequence",
+        help="Test sequence name from collection_config.json to associate with this run.",
+    )
+    parser.add_argument(
+        "--list-sequences",
+        action="store_true",
+        help="List configured test sequences and exit.",
+    )
     return parser.parse_args()
 
 
-def load_config(path: Path) -> SerialConfig:
+def load_raw_config(path: Path) -> dict[str, Any]:
     try:
-        raw_config = json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise ValueError(f"Config file not found: {path}") from None
     except json.JSONDecodeError as exc:
         raise ValueError(f"Invalid JSON config '{path}': {exc}") from None
 
+
+def load_config(path: Path, sequence_name: str = "") -> SerialConfig:
+    raw_config = load_raw_config(path)
     ports = require_string_list(raw_config, "ports")
     commands = require_string_list(raw_config, "commands")
+    test_sequences = get_test_sequences(raw_config)
+    selected_sequence_name = sequence_name
+    selected_sequence_value = ""
+
+    if selected_sequence_name:
+        if selected_sequence_name not in test_sequences:
+            raise ValueError(
+                f"Unknown sequence '{selected_sequence_name}'. "
+                f"Use --list-sequences to see configured names."
+            )
+        selected_sequence_value = test_sequences[selected_sequence_name]
 
     if not ports:
         raise ValueError("Config value 'ports' must include at least one COM port.")
@@ -123,6 +153,8 @@ def load_config(path: Path) -> SerialConfig:
 
     return SerialConfig(
         test_suite=str(raw_config.get("test_suite", "Serial Log Viewer")),
+        selected_sequence_name=selected_sequence_name,
+        selected_sequence_value=selected_sequence_value,
         ports=ports,
         commands=commands,
         pre_commands=optional_string_list(raw_config, "pre_commands"),
@@ -133,6 +165,47 @@ def load_config(path: Path) -> SerialConfig:
         line_ending=line_ending,
         log_dir=Path(str(raw_config.get("log_dir", "logs"))),
     )
+
+
+def get_test_sequences(config: dict[str, Any]) -> dict[str, str]:
+    value = config.get("test_sequences", {})
+    if value is None:
+        return {}
+    if not isinstance(value, dict) or not all(
+        isinstance(key, str) and isinstance(item, str) for key, item in value.items()
+    ):
+        raise ValueError("Config value 'test_sequences' must be an object of string names and string sequences.")
+    return value
+
+
+def choose_sequence(raw_config: dict[str, Any], requested_sequence: str = "") -> str:
+    test_sequences = get_test_sequences(raw_config)
+    if requested_sequence or not test_sequences:
+        return requested_sequence
+
+    names = list(test_sequences)
+    print("Select test sequence for this collection run:")
+    for index, name in enumerate(names, start=1):
+        print(f"  {index}. {name}")
+
+    while True:
+        answer = input("Sequence number or exact name: ").strip()
+        if answer.isdigit():
+            index = int(answer)
+            if 1 <= index <= len(names):
+                return names[index - 1]
+        if answer in test_sequences:
+            return answer
+        print("Invalid selection. Try again.")
+
+
+def print_sequences(raw_config: dict[str, Any]) -> None:
+    test_sequences = get_test_sequences(raw_config)
+    if not test_sequences:
+        print("No test sequences configured.")
+        return
+    for name, sequence in test_sequences.items():
+        print(f"{name}: {sequence}")
 
 
 def require_string_list(config: dict[str, Any], key: str) -> list[str]:
@@ -430,7 +503,12 @@ def main() -> int:
     config_path = Path(args.config).resolve()
 
     try:
-        config = load_config(config_path)
+        raw_config = load_raw_config(config_path)
+        if args.list_sequences:
+            print_sequences(raw_config)
+            return 0
+        selected_sequence = choose_sequence(raw_config, args.sequence or "")
+        config = load_config(config_path, selected_sequence)
     except ValueError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
@@ -451,6 +529,8 @@ def main() -> int:
 
     print(f"Writing log to {log_path}")
     print(f"Polling {len(config.ports)} port(s): {', '.join(config.ports)}")
+    if config.selected_sequence_name:
+        print(f"Sequence: {config.selected_sequence_name}")
 
     try:
         for thread in threads:

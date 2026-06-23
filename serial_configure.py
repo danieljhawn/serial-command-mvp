@@ -10,12 +10,12 @@ from typing import Any
 import serial
 
 
-DEFAULT_CONFIG_PATH = Path(__file__).with_name("serial_configure.json")
+DEFAULT_CONFIG_PATH = Path(__file__).with_name("device_configure.json")
 
 
 @dataclass(frozen=True)
 class ConfigureConfig:
-    port: str
+    ports: list[str]
     apply_commands: list[str]
     verify_commands: list[str]
     baud: int
@@ -27,14 +27,14 @@ class ConfigureConfig:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Apply configuration commands to one serial device and verify the result."
+        description="Apply configuration commands to one or more serial devices and verify the result."
     )
     parser.add_argument(
         "--config",
         default=str(DEFAULT_CONFIG_PATH),
         help=f"Path to JSON config file (default: {DEFAULT_CONFIG_PATH})",
     )
-    parser.add_argument("--port", help="Override configured serial port, e.g. COM11")
+    parser.add_argument("--port", help="Configure one serial port instead of configured ports, e.g. COM11")
     parser.add_argument(
         "--yes",
         action="store_true",
@@ -62,12 +62,12 @@ def load_config(path: Path, port_override: str | None = None) -> ConfigureConfig
     if line_ending not in {"none", "cr", "lf", "crlf"}:
         raise ValueError("Config value 'line_ending' must be one of: none, cr, lf, crlf.")
 
-    port = port_override or str(raw_config.get("port", "")).strip()
-    if not port:
-        raise ValueError("Config value 'port' is required, or pass --port.")
+    ports = [port_override] if port_override else get_ports(raw_config)
+    if not ports:
+        raise ValueError("Config value 'ports' must include at least one COM port, or pass --port.")
 
     return ConfigureConfig(
-        port=port,
+        ports=ports,
         apply_commands=apply_commands,
         verify_commands=verify_commands,
         baud=int(raw_config.get("baud", 4096)),
@@ -76,6 +76,13 @@ def load_config(path: Path, port_override: str | None = None) -> ConfigureConfig
         line_ending=line_ending,
         log_dir=Path(str(raw_config.get("log_dir", "logs"))),
     )
+
+
+def get_ports(config: dict[str, Any]) -> list[str]:
+    if "ports" in config:
+        return require_string_list(config, "ports")
+    port = str(config.get("port", "")).strip()
+    return [port] if port else []
 
 
 def require_string_list(config: dict[str, Any], key: str) -> list[str]:
@@ -210,9 +217,9 @@ def wait_for_ready_prompt(ser: serial.Serial, config: ConfigureConfig) -> dict[s
     }
 
 
-def open_serial(config: ConfigureConfig) -> serial.Serial:
+def open_serial(port: str, config: ConfigureConfig) -> serial.Serial:
     return serial.Serial(
-        port=config.port,
+        port=port,
         baudrate=config.baud,
         bytesize=serial.EIGHTBITS,
         parity=serial.PARITY_NONE,
@@ -274,8 +281,8 @@ def make_log_path(config: ConfigureConfig, config_path: Path) -> Path:
     return log_dir / filename
 
 
-def find_command_record(log: dict[str, Any], command: str) -> dict[str, Any] | None:
-    for record in log["commands"]:
+def find_command_record(device_log: dict[str, Any], command: str) -> dict[str, Any] | None:
+    for record in device_log["commands"]:
         if record.get("command") == command:
             return record
     return None
@@ -295,14 +302,14 @@ def gnss_enabled_status(lines: list[str]) -> str:
     return ""
 
 
-def print_verification_summary(log: dict[str, Any]) -> None:
-    con_record = find_command_record(log, "con") or {}
-    sta_record = find_command_record(log, "sta") or {}
+def print_verification_summary(device_log: dict[str, Any]) -> None:
+    con_record = find_command_record(device_log, "con") or {}
+    sta_record = find_command_record(device_log, "sta") or {}
     con_fields = con_record.get("response_fields", {})
     sta_lines = sta_record.get("response_text", [])
 
     print("")
-    print("Verification summary:")
+    print(f"Verification summary for {device_log['port']}:")
     print(f"  Version: {con_fields.get('Version', 'n/a')}")
     print(f"  Model Number: {con_fields.get('Model #', 'n/a')}")
     print(f"  High Current Cal Factor 650A: {con_fields.get('High Current Cal Factor 650A', 'n/a')}")
@@ -311,7 +318,7 @@ def print_verification_summary(log: dict[str, Any]) -> None:
 
 
 def confirm_or_exit(config: ConfigureConfig, assume_yes: bool) -> None:
-    print(f"About to configure one device on {config.port}.")
+    print(f"About to configure {len(config.ports)} device(s): {', '.join(config.ports)}")
     print("Apply commands:")
     for command in config.apply_commands:
         print(f"  - {command}")
@@ -325,6 +332,71 @@ def confirm_or_exit(config: ConfigureConfig, assume_yes: bool) -> None:
     answer = input("Type YES to send apply commands: ").strip()
     if answer != "YES":
         raise KeyboardInterrupt("Configuration cancelled.")
+
+
+def make_device_log(port: str) -> dict[str, Any]:
+    return {
+        "port": port,
+        "started_at": timestamp(),
+        "finished_at": None,
+        "commands": [],
+        "status": "PENDING",
+    }
+
+
+def configure_port(port: str, config: ConfigureConfig) -> dict[str, Any]:
+    device_log = make_device_log(port)
+
+    try:
+        ser = open_serial(port, config)
+    except serial.SerialException as exc:
+        device_log["status"] = "ERROR"
+        device_log["error"] = f"Could not open serial port '{port}': {exc}"
+        device_log["finished_at"] = timestamp()
+        print(f"ERROR: {device_log['error']}", file=sys.stderr)
+        return device_log
+
+    try:
+        ser.reset_input_buffer()
+        ser.reset_output_buffer()
+
+        startup_record = wait_for_ready_prompt(ser, config)
+        device_log["commands"].append(startup_record)
+        print(f"[{port}] [startup] prompt -> {startup_record['status']} in {startup_record['elapsed_seconds']:.3f}s")
+        if startup_record["status"] != "OK":
+            device_log["status"] = "ERROR"
+            return device_log
+
+        for command in config.apply_commands:
+            record = run_command(ser, "apply", command, config)
+            device_log["commands"].append(record)
+            print(f"[{port}] [apply] {command!r} -> {record['status']} in {record['elapsed_seconds']:.3f}s")
+            if record["status"] != "OK":
+                device_log["status"] = "ERROR"
+                return device_log
+
+        for command in config.verify_commands:
+            record = run_command(ser, "verify", command, config)
+            device_log["commands"].append(record)
+            print(f"[{port}] [verify] {command!r} -> {record['status']} in {record['elapsed_seconds']:.3f}s")
+            if record["status"] != "OK":
+                device_log["status"] = "ERROR"
+                return device_log
+
+        device_log["status"] = "OK"
+        print_verification_summary(device_log)
+        return device_log
+    except serial.SerialException as exc:
+        device_log["status"] = "ERROR"
+        device_log["error"] = str(exc)
+        print(f"ERROR: Serial communication failed on {port}: {exc}", file=sys.stderr)
+        return device_log
+    finally:
+        try:
+            ser.close()
+        except Exception:
+            pass
+        device_log["finished_at"] = timestamp()
 
 
 def main() -> int:
@@ -346,7 +418,7 @@ def main() -> int:
         "started_at": timestamp(),
         "finished_at": None,
         "config_path": str(config_path),
-        "port": config.port,
+        "ports": config.ports,
         "settings": {
             "baud": config.baud,
             "timeout": config.timeout,
@@ -355,64 +427,26 @@ def main() -> int:
         },
         "apply_commands": config.apply_commands,
         "verify_commands": config.verify_commands,
-        "commands": [],
+        "devices": {},
         "status": "PENDING",
     }
 
-    try:
-        ser = open_serial(config)
-    except serial.SerialException as exc:
-        log["status"] = "ERROR"
-        log["error"] = f"Could not open serial port '{config.port}': {exc}"
-        log["finished_at"] = timestamp()
-        log_path.write_text(json.dumps(log, indent=2), encoding="utf-8")
-        print(f"ERROR: {log['error']}", file=sys.stderr)
-        print(f"Wrote log: {log_path}")
-        return 1
-
-    try:
-        ser.reset_input_buffer()
-        ser.reset_output_buffer()
-
-        startup_record = wait_for_ready_prompt(ser, config)
-        log["commands"].append(startup_record)
-        print(f"[startup] prompt -> {startup_record['status']} in {startup_record['elapsed_seconds']:.3f}s")
-        if startup_record["status"] != "OK":
+    for port in config.ports:
+        print("")
+        print(f"Configuring {port}...")
+        device_log = configure_port(port, config)
+        log["devices"][port] = device_log
+        if device_log["status"] != "OK":
             log["status"] = "ERROR"
-            return 1
+            break
 
-        for command in config.apply_commands:
-            record = run_command(ser, "apply", command, config)
-            log["commands"].append(record)
-            print(f"[apply] {command!r} -> {record['status']} in {record['elapsed_seconds']:.3f}s")
-            if record["status"] != "OK":
-                log["status"] = "ERROR"
-                return 1
-
-        for command in config.verify_commands:
-            record = run_command(ser, "verify", command, config)
-            log["commands"].append(record)
-            print(f"[verify] {command!r} -> {record['status']} in {record['elapsed_seconds']:.3f}s")
-            if record["status"] != "OK":
-                log["status"] = "ERROR"
-                return 1
-
+    if log["status"] == "PENDING":
         log["status"] = "OK"
-        print_verification_summary(log)
-        return 0
-    except serial.SerialException as exc:
-        log["status"] = "ERROR"
-        log["error"] = str(exc)
-        print(f"ERROR: Serial communication failed: {exc}", file=sys.stderr)
-        return 1
-    finally:
-        try:
-            ser.close()
-        except Exception:
-            pass
-        log["finished_at"] = timestamp()
-        log_path.write_text(json.dumps(log, indent=2), encoding="utf-8")
-        print(f"Wrote log: {log_path}")
+
+    log["finished_at"] = timestamp()
+    log_path.write_text(json.dumps(log, indent=2), encoding="utf-8")
+    print(f"Wrote log: {log_path}")
+    return 0 if log["status"] == "OK" else 1
 
 
 if __name__ == "__main__":

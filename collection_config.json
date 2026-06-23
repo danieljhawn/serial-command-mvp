@@ -1,0 +1,32 @@
+{
+  "ports": ["COM11", "COM12", "COM13", "COM14", "COM25", "COM26"],
+  "test_suite": "Validate Low Current Curve - 120.12 - 6.64",
+  "test_sequences": {
+    "1 - LCC Non-blinking": "30s 8a 400ms 50a 5s 0a 30s 30a 200ms 100a 5s 0a 20s 55a 80ms 200a",
+    "2 - LCC Blinking3": "30s 10a 150ms 70a 15s 0a 50s 10a 5s 0a 30s 25a 250ms 160a 15s 0a 50s 20a 5s 0a 20s 50a 300ms 310a 15s 0a 50s 30a",
+    "3 - LCC SOTF": "100ms 85a",
+    "4 - LCC Reset Current1": "50s 10a",
+    "5 - LCC Ride Through": "30s 10a 200ms 80a 18s 9a", 
+    "7 - LCC Normal Fault": "30s 10a 550ms 65a",
+    "9 - LCC Fault Temp": "30s 20a 250ms 140a 100ms 0a 15s 12a",
+    "10 - LCC Reset Current": "50s 20a",
+    "3a - LCC SOTF 2": "400ms 65a",
+    "7a - LCC Normal Fault 2": "70s 10a 550ms 50a",
+    "7b - LCC Normal Fault 3": "70s 10a 300ms 70a",
+    "7c - LCC Normal Fault 4": "70s 10a 200ms 60a",
+    "7d - LCC Normal Fault 5": "70s 10a 200ms 85a",
+    "7e - LCC Normal Fault 6": "70s 10a 80ms 85a",
+    "7f - LCC Normal Fault 7": "70s 10a 60ms 120a",
+    "7g - LCC Normal Fault 8": "70s 10a 15ms 120a",
+    "9a - LCC Fault Temp 2": "70s 30a 300ms 70a 100ms 0a 15s 10a",
+    "9b - LCC Fault Temp 3": "30s 30a 30s 90a 400ms 600a 100ms 0a 15s 90a",
+    "9c - LCC Fault Temp 4": "30s 30a 30s 90a"
+  },
+  "timeout": 10,
+  "prompt_prefix": "# SGS",
+  "line_ending": "cr",
+  "log_dir": "logs",
+  "pre_commands": [],
+  "commands": ["con", "sta", "eve"],
+  "post_commands": []
+}
