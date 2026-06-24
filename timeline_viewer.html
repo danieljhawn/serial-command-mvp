@@ -15,6 +15,7 @@
       --accent: #1f6feb;
       --test: #7a42c6;
       --log: #0969da;
+      --configure: #c17d10;
       --ok: #137333;
       --bad: #b42318;
       --code: #f1f4f8;
@@ -31,6 +32,7 @@
       --accent: #7aa7ff;
       --test: #c8a6ff;
       --log: #85b7ff;
+      --configure: #ffcd6b;
       --ok: #72d391;
       --bad: #ff8a80;
       --code: #10141b;
@@ -170,7 +172,7 @@
     .timeline {
       position: relative;
       min-width: 1200px;
-      height: 420px;
+      height: 500px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background:
@@ -192,7 +194,11 @@
     }
 
     .log-axis {
-      top: 286px;
+      top: 260px;
+    }
+
+    .configure-axis {
+      top: 400px;
     }
 
     .lane-label {
@@ -212,7 +218,11 @@
     }
 
     .log-label {
-      top: 258px;
+      top: 232px;
+    }
+
+    .configure-label {
+      top: 372px;
     }
 
     .tick {
@@ -256,6 +266,10 @@
 
     .marker.log {
       background: var(--log);
+    }
+
+    .marker.configure {
+      background: var(--configure);
     }
 
     .marker.error {
@@ -524,7 +538,7 @@
     function render() {
       const events = filteredEvents();
       const bounds = timelineBounds(events);
-      subtitle.textContent = `${countKind(events, "test")} tests | ${countKind(events, "log")} serial logs | ${formatDate(bounds.start)} to ${formatDate(bounds.end)}`;
+      subtitle.textContent = `${countKind(events, "test")} tests | ${countKind(events, "log")} collection logs | ${countKind(events, "configure")} configure logs | ${formatDate(bounds.start)} to ${formatDate(bounds.end)}`;
       timelineCount.textContent = `${events.length} events`;
       renderTimeline(events, bounds);
       if (selectedEventId) {
@@ -546,18 +560,20 @@
       timeline.style.setProperty("--grid-step", `${Math.max(80, width / 10)}px`);
       addAxis("test-axis");
       addAxis("log-axis");
+      addAxis("configure-axis");
       addLaneLabel("Tests", "test-label");
-      addLaneLabel("Serial Logs", "log-label");
+      addLaneLabel("Collection Logs", "log-label");
+      addLaneLabel("Configure Logs", "configure-label");
       addTicks(bounds, width);
 
-      const laneOffsets = { test: 132, log: 286 };
+      const laneOffsets = { test: 132, log: 260, configure: 400 };
       const stacks = {};
       events.forEach(event => {
         const x = 28 + ((new Date(event.timestamp).getTime() - bounds.start) / duration) * (width - 56);
         const stackKey = `${event.kind}-${Math.round(x / 24)}`;
         const stackIndex = stacks[stackKey] || 0;
         stacks[stackKey] = stackIndex + 1;
-        const y = laneOffsets[event.kind] + ((stackIndex % 5) - 2) * 22;
+        const y = (laneOffsets[event.kind] || laneOffsets.log) + ((stackIndex % 5) - 2) * 22;
         timeline.appendChild(renderMarker(event, x, y));
       });
     }
@@ -574,7 +590,7 @@
       }
       marker.style.left = `${x}px`;
       marker.style.top = `${y}px`;
-      marker.textContent = event.kind === "test" ? "T" : "L";
+      marker.textContent = markerLabel(event);
       marker.setAttribute("aria-label", `${event.kind}: ${event.title}`);
       marker.addEventListener("mouseenter", mouseEvent => showQuickview(event, mouseEvent));
       marker.addEventListener("mousemove", moveQuickview);
@@ -648,13 +664,14 @@
       detailBody.querySelector(".time").textContent = `${formatDate(event.timestamp)} to ${formatDate(event.finished_at)}`;
       detailBody.querySelector(".title").textContent = event.title;
       const pills = detailBody.querySelector(".pill-row");
+      addPill(pills, event.kind === "configure" ? "configure" : "collection");
       addPill(pills, event.error_count ? `${event.error_count} errors` : "OK", event.error_count ? "error" : "ok");
       addPill(pills, event.position_label || "unmatched");
       addPill(pills, `Commands: ${(event.commands || []).join(", ")}`);
       if (event.viewer_file) {
         const link = document.createElement("a");
-        link.href = `logs/${event.viewer_file}`;
-        link.textContent = "open full log viewer";
+        link.href = event.viewer_file;
+        link.textContent = event.kind === "configure" ? "open configure viewer" : "open full log viewer";
         pills.appendChild(link);
       }
       const grid = detailBody.querySelector(".device-grid");
@@ -715,7 +732,18 @@
       if (event.kind === "test") {
         return `Expected: ${event.expected_result || "n/a"}`;
       }
-      return `${event.position_label || "unmatched"} | ${(event.commands || []).join(", ")} | ${event.device_count || 0} devices`;
+      const label = event.kind === "configure" ? "Configure" : "Collection";
+      return `${label} | ${event.position_label || "unmatched"} | ${(event.commands || []).join(", ")} | ${event.device_count || 0} devices`;
+    }
+
+    function markerLabel(event) {
+      if (event.kind === "test") {
+        return "T";
+      }
+      if (event.kind === "configure") {
+        return "C";
+      }
+      return "L";
     }
 
     function renderDeviceValue(name, value) {

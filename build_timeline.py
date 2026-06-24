@@ -18,10 +18,15 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Build a timeline report from condensed test results and serial JSON logs."
     )
-    parser.add_argument("--csv", default=str(DEFAULT_CSV_PATH), help="Condensed test results CSV.")
-    parser.add_argument("--logs", default=str(DEFAULT_LOG_DIR), help="Directory containing serial_log_*.json files.")
-    parser.add_argument("--index", default=str(DEFAULT_INDEX_PATH), help="Output timeline index JSON.")
-    parser.add_argument("--report", default=str(DEFAULT_REPORT_PATH), help="Output embedded timeline HTML report.")
+    parser.add_argument(
+        "folder",
+        nargs="?",
+        help="Folder to scan recursively for condensed CSV, serial logs, and configure logs.",
+    )
+    parser.add_argument("--csv", help="Condensed test results CSV.")
+    parser.add_argument("--logs", help="Directory to scan recursively for serial/configure JSON logs.")
+    parser.add_argument("--index", help="Output timeline index JSON.")
+    parser.add_argument("--report", help="Output embedded timeline HTML report.")
     return parser.parse_args()
 
 
@@ -79,43 +84,74 @@ def clean_cell(value: Any) -> str:
     return "\n".join(line.strip() for line in str(value).splitlines()).strip()
 
 
-def load_logs(log_dir: Path) -> list[dict[str, Any]]:
+def find_csv(folder: Path) -> Path:
+    preferred = list(folder.rglob("condensedTestResults.csv"))
+    if preferred:
+        return sorted(preferred)[0]
+
+    candidates = sorted(folder.rglob("*.csv"))
+    if not candidates:
+        raise FileNotFoundError(f"No CSV file found in folder: {folder}")
+    if len(candidates) > 1:
+        names = ", ".join(str(path.relative_to(folder)) for path in candidates[:5])
+        raise ValueError(
+            f"Multiple CSV files found in {folder}. Pass --csv explicitly. Found: {names}"
+        )
+    return candidates[0]
+
+
+def find_log_files(log_dir: Path) -> list[Path]:
+    patterns = ("serial_log_*.json", "configure_log_*.json")
+    paths: list[Path] = []
+    for pattern in patterns:
+        paths.extend(log_dir.rglob(pattern))
+    return sorted(
+        path
+        for path in paths
+        if not path.name.endswith("_viewer.json")
+    )
+
+
+def load_logs(log_dir: Path, link_base_dir: Path) -> list[dict[str, Any]]:
     logs: list[dict[str, Any]] = []
-    for path in sorted(log_dir.glob("serial_log_*.json")):
-        if path.name.endswith("_viewer.json"):
-            continue
+    for path in find_log_files(log_dir):
         data = json.loads(path.read_text(encoding="utf-8"))
         if "devices" not in data:
             continue
 
-        viewer_path = path.with_name(f"{path.stem}_viewer.html")
-        devices = [summarize_device(port, device) for port, device in sorted(data.get("devices", {}).items())]
-        commands = sorted(
-            {
-                command.get("command", "")
-                for device in data.get("devices", {}).values()
-                for command in device.get("commands", [])
-                if command.get("command")
-            }
-        )
-
-        logs.append(
-            {
-                "id": path.stem,
-                "kind": "log",
-                "timestamp": data.get("started_at") or data.get("finished_at"),
-                "finished_at": data.get("finished_at"),
-                "title": path.stem,
-                "test_suite": data.get("test_suite") or data.get("settings", {}).get("test_suite", ""),
-                "file": path.name,
-                "viewer_file": viewer_path.name if viewer_path.exists() else "",
-                "commands": commands,
-                "devices": devices,
-                "device_count": len(devices),
-                "error_count": sum(1 for device in devices if device["status"] != "OK"),
-            }
-        )
+        logs.append(summarize_log(path, data, link_base_dir))
     return logs
+
+
+def summarize_log(path: Path, data: dict[str, Any], link_base_dir: Path) -> dict[str, Any]:
+    viewer_path = path.with_name(f"{path.stem}_viewer.html")
+    devices = [summarize_device(port, device) for port, device in sorted(data.get("devices", {}).items())]
+    commands = sorted(
+        {
+            command.get("command", "")
+            for device in data.get("devices", {}).values()
+            for command in device.get("commands", [])
+            if command.get("command")
+        }
+    )
+    kind = "configure" if path.name.startswith("configure_log_") else "log"
+    relative_file = path.relative_to(link_base_dir).as_posix() if path.is_relative_to(link_base_dir) else path.name
+    relative_viewer = viewer_path.relative_to(link_base_dir).as_posix() if viewer_path.exists() and viewer_path.is_relative_to(link_base_dir) else ""
+
+    return {
+        "id": path.stem,
+        "kind": kind,
+        "timestamp": data.get("started_at") or data.get("finished_at"),
+        "finished_at": data.get("finished_at"),
+        "title": path.stem,
+        "test_suite": data.get("test_suite") or data.get("settings", {}).get("test_suite", ""),
+        "file": relative_file,
+        "viewer_file": relative_viewer,
+        "commands": commands,
+        "devices": devices,
+        "device_count": len(devices),
+        "error_count": sum(1 for device in devices if device["status"] != "OK"),
+    }
 
 
 def summarize_device(port: str, device: dict[str, Any]) -> dict[str, Any]:
@@ -185,7 +221,8 @@ def build_position_label(
 
 def build_index(csv_path: Path, log_dir: Path) -> dict[str, Any]:
     tests = load_tests(csv_path)
-    logs = load_logs(log_dir)
+    link_base_dir = log_dir.parent if log_dir.name.lower() == "logs" else log_dir
+    logs = load_logs(log_dir, link_base_dir)
     attach_log_context(tests, logs)
     events = sorted(
         tests + logs,
@@ -201,6 +238,15 @@ def build_index(csv_path: Path, log_dir: Path) -> dict[str, Any]:
     }
 
 
+def resolve_paths(args: argparse.Namespace) -> tuple[Path, Path, Path, Path]:
+    folder = Path(args.folder).resolve() if args.folder else None
+    csv_path = Path(args.csv).resolve() if args.csv else (find_csv(folder) if folder else DEFAULT_CSV_PATH)
+    log_dir = Path(args.logs).resolve() if args.logs else (folder if folder else DEFAULT_LOG_DIR)
+    index_path = Path(args.index).resolve() if args.index else ((folder / "timeline_index.json") if folder else DEFAULT_INDEX_PATH)
+    report_path = Path(args.report).resolve() if args.report else ((folder / "timeline_report.html") if folder else DEFAULT_REPORT_PATH)
+    return csv_path, log_dir, index_path, report_path
+
+
 def write_report(index: dict[str, Any], viewer_path: Path, report_path: Path) -> None:
     if not viewer_path.exists():
         raise FileNotFoundError(f"Timeline viewer template not found: {viewer_path}")
@@ -214,10 +260,11 @@ def write_report(index: dict[str, Any], viewer_path: Path, report_path: Path) ->
 
 def main() -> int:
     args = parse_args()
-    csv_path = Path(args.csv).resolve()
-    log_dir = Path(args.logs).resolve()
-    index_path = Path(args.index).resolve()
-    report_path = Path(args.report).resolve()
+    try:
+        csv_path, log_dir, index_path, report_path = resolve_paths(args)
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"ERROR: {exc}")
+        return 1
 
     index = build_index(csv_path, log_dir)
     index_path.write_text(json.dumps(index, indent=2), encoding="utf-8")
@@ -225,7 +272,9 @@ def main() -> int:
 
     print(f"Wrote timeline index: {index_path}")
     print(f"Wrote timeline report: {report_path}")
-    print(f"Tests: {len(index['tests'])}; logs: {len(index['logs'])}")
+    collection_count = sum(1 for log in index["logs"] if log["kind"] == "log")
+    configure_count = sum(1 for log in index["logs"] if log["kind"] == "configure")
+    print(f"Tests: {len(index['tests'])}; collection logs: {collection_count}; configure logs: {configure_count}")
     return 0
 
 

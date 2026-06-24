@@ -2,6 +2,7 @@ import argparse
 import json
 import sys
 import time
+import webbrowser
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +12,7 @@ import serial
 
 
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("device_configure.json")
+VIEWER_PATH = Path(__file__).with_name("configure_viewer.html")
 
 
 @dataclass(frozen=True)
@@ -39,6 +41,11 @@ def parse_args() -> argparse.Namespace:
         "--yes",
         action="store_true",
         help="Skip the confirmation prompt before sending apply commands.",
+    )
+    parser.add_argument(
+        "--no-viewer",
+        action="store_true",
+        help="Do not generate and open the HTML viewer after configuring.",
     )
     return parser.parse_args()
 
@@ -281,40 +288,35 @@ def make_log_path(config: ConfigureConfig, config_path: Path) -> Path:
     return log_dir / filename
 
 
-def find_command_record(device_log: dict[str, Any], command: str) -> dict[str, Any] | None:
-    for record in device_log["commands"]:
-        if record.get("command") == command:
-            return record
-    return None
+def make_report_path(log_path: Path) -> Path:
+    return log_path.with_name(f"{log_path.stem}_viewer.html")
 
 
-def first_matching_line(lines: list[str], prefixes: tuple[str, ...]) -> str:
-    for line in lines:
-        if line.startswith(prefixes):
-            return line
-    return ""
+def create_viewer_report(log_path: Path) -> Path:
+    if not VIEWER_PATH.exists():
+        raise FileNotFoundError(f"Viewer template not found: {VIEWER_PATH}")
+
+    viewer_html = VIEWER_PATH.read_text(encoding="utf-8")
+    log_json = log_path.read_text(encoding="utf-8")
+    embedded_script = (
+        f"window.CONFIGURE_LOG_DATA = {log_json};\n"
+        f"window.CONFIGURE_LOG_FILE = {json.dumps(log_path.name)};\n"
+    )
+
+    marker = "// CONFIGURE_LOG_DATA"
+    if marker not in viewer_html:
+        raise ValueError(f"Viewer template is missing marker: {marker}")
+
+    report_html = viewer_html.replace(marker, embedded_script, 1)
+    report_path = make_report_path(log_path)
+    report_path.write_text(report_html, encoding="utf-8")
+    return report_path
 
 
-def gnss_enabled_status(lines: list[str]) -> str:
-    for line in lines:
-        if line.startswith("GNSS Enabled") or line.startswith("GNSS Disabled"):
-            return line
-    return ""
-
-
-def print_verification_summary(device_log: dict[str, Any]) -> None:
-    con_record = find_command_record(device_log, "con") or {}
-    sta_record = find_command_record(device_log, "sta") or {}
-    con_fields = con_record.get("response_fields", {})
-    sta_lines = sta_record.get("response_text", [])
-
-    print("")
-    print(f"Verification summary for {device_log['port']}:")
-    print(f"  Version: {con_fields.get('Version', 'n/a')}")
-    print(f"  Model Number: {con_fields.get('Model #', 'n/a')}")
-    print(f"  High Current Cal Factor 650A: {con_fields.get('High Current Cal Factor 650A', 'n/a')}")
-    print(f"  GNSS status: {gnss_enabled_status(sta_lines) or 'n/a'}")
-    print(f"  Database designation: {sta_lines[-1] if sta_lines else 'n/a'}")
+def open_viewer_report(log_path: Path) -> None:
+    report_path = create_viewer_report(log_path)
+    webbrowser.open(report_path.resolve().as_uri())
+    print(f"Opened viewer: {report_path}")
 
 
 def confirm_or_exit(config: ConfigureConfig, assume_yes: bool) -> None:
@@ -384,7 +386,6 @@ def configure_port(port: str, config: ConfigureConfig) -> dict[str, Any]:
                 return device_log
 
         device_log["status"] = "OK"
-        print_verification_summary(device_log)
         return device_log
     except serial.SerialException as exc:
         device_log["status"] = "ERROR"
@@ -446,6 +447,13 @@ def main() -> int:
     log["finished_at"] = timestamp()
     log_path.write_text(json.dumps(log, indent=2), encoding="utf-8")
     print(f"Wrote log: {log_path}")
+
+    if not args.no_viewer:
+        try:
+            open_viewer_report(log_path)
+        except Exception as exc:
+            print(f"WARNING: Could not open viewer: {exc}", file=sys.stderr)
+
     return 0 if log["status"] == "OK" else 1
 
 

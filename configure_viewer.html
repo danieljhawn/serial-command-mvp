@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device Configure Viewer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1b1f24;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #1f6feb;
+      --ok: #137333;
+      --bad: #b42318;
+      --warn: #b54708;
+      --code: #f1f4f8;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #0f1115;
+      --panel: #171b22;
+      --text: #e7eaf0;
+      --muted: #9aa4b2;
+      --line: #303846;
+      --accent: #7aa7ff;
+      --ok: #72d391;
+      --bad: #ff8a80;
+      --warn: #ffc266;
+      --code: #10141b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      backdrop-filter: blur(8px);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 10px 16px;
+      align-items: start;
+      padding: 10px 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    main {
+      padding: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      grid-column: 1 / -1;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filters,
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .header-actions {
+      justify-content: flex-end;
+    }
+
+    button,
+    select {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 0 10px;
+    }
+
+    select {
+      padding: 0 8px;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
+    #devices {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, max-content));
+      gap: 10px;
+      align-items: start;
+      justify-content: start;
+    }
+
+    details {
+      width: fit-content;
+      max-width: calc(100vw - 24px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    summary {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      padding: 9px 10px;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::before {
+      content: ">";
+      color: var(--muted);
+      font-size: 14px;
+      transition: transform 120ms ease;
+    }
+
+    details[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .summary-title {
+      display: flex;
+      flex: 1;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .port {
+      font-weight: 750;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: var(--code);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .pill.ok {
+      background: color-mix(in srgb, var(--ok) 18%, transparent);
+      color: var(--ok);
+    }
+
+    .pill.error {
+      background: color-mix(in srgb, var(--bad) 18%, transparent);
+      color: var(--bad);
+    }
+
+    .pill.timeout {
+      background: color-mix(in srgb, var(--warn) 18%, transparent);
+      color: var(--warn);
+    }
+
+    .device-body,
+    .command-body {
+      border-top: 1px solid var(--line);
+      padding: 8px 10px 10px;
+    }
+
+    .commands {
+      display: grid;
+      gap: 8px;
+    }
+
+    .command summary {
+      padding: 8px 9px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 7px;
+      background: color-mix(in srgb, var(--panel) 82%, var(--code));
+    }
+
+    .key {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .value {
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px;
+      background: var(--code);
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 700px) {
+      .topbar,
+      main {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions {
+        justify-content: flex-start;
+      }
+
+      #devices {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>Device Configure Viewer</h1>
+        <div id="pageTimestamp" class="subtitle">Choose a configure JSON file.</div>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" type="button">Dark Mode</button>
+        <input id="fileInput" type="file" accept="application/json,.json">
+      </div>
+      <section id="toolbar" class="toolbar hidden">
+        <div class="filters">
+          <label>
+            Phase
+            <select id="phaseFilter">
+              <option value="">All</option>
+            </select>
+          </label>
+          <label>
+            View
+            <select id="viewMode">
+              <option value="fields">Fields first</option>
+              <option value="lines">Lines first</option>
+            </select>
+          </label>
+          <label>
+            <input id="showFields" type="checkbox" checked>
+            Show fields
+          </label>
+        </div>
+        <div>
+          <button id="expandAll" type="button">Expand All</button>
+          <button id="collapseAll" type="button">Collapse All</button>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main>
+    <section id="emptyState" class="empty">Choose a configure log JSON file to view device responses.</section>
+    <section id="devices"></section>
+  </main>
+
+  <script>
+    // CONFIGURE_LOG_DATA
+    const fileInput = document.getElementById("fileInput");
+    const pageTimestamp = document.getElementById("pageTimestamp");
+    const emptyState = document.getElementById("emptyState");
+    const toolbar = document.getElementById("toolbar");
+    const phaseFilter = document.getElementById("phaseFilter");
+    const viewMode = document.getElementById("viewMode");
+    const showFields = document.getElementById("showFields");
+    const devicesContainer = document.getElementById("devices");
+    const expandAll = document.getElementById("expandAll");
+    const collapseAll = document.getElementById("collapseAll");
+    const themeToggle = document.getElementById("themeToggle");
+    let currentLog = null;
+
+    applyTheme(localStorage.getItem("configureViewerTheme") || "light");
+    showFields.checked = localStorage.getItem("configureViewerShowFields") !== "false";
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        return;
+      }
+
+      try {
+        currentLog = JSON.parse(await file.text());
+        render(currentLog);
+      } catch (error) {
+        currentLog = null;
+        devicesContainer.innerHTML = "";
+        toolbar.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+        emptyState.textContent = `Could not load JSON: ${error.message}`;
+      }
+    });
+
+    phaseFilter.addEventListener("change", () => renderDevices(currentLog));
+    viewMode.addEventListener("change", () => renderDevices(currentLog));
+    showFields.addEventListener("change", () => {
+      localStorage.setItem("configureViewerShowFields", String(showFields.checked));
+      renderDevices(currentLog);
+    });
+    expandAll.addEventListener("click", () => setAllDetails(true));
+    collapseAll.addEventListener("click", () => setAllDetails(false));
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = document.body.classList.contains("dark") ? "light" : "dark";
+      applyTheme(nextTheme);
+      localStorage.setItem("configureViewerTheme", nextTheme);
+    });
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.CONFIGURE_LOG_DATA) {
+        currentLog = window.CONFIGURE_LOG_DATA;
+        render(currentLog);
+      }
+    });
+
+    function render(log) {
+      emptyState.classList.add("hidden");
+      toolbar.classList.remove("hidden");
+      pageTimestamp.textContent = `Started ${formatDate(log.started_at)}${log.finished_at ? ` | Finished ${formatDate(log.finished_at)}` : ""}`;
+      renderPhaseFilter(log);
+      renderDevices(log);
+    }
+
+    function renderPhaseFilter(log) {
+      const previous = phaseFilter.value;
+      const phases = new Set();
+      for (const device of Object.values(log.devices || {})) {
+        for (const command of device.commands || []) {
+          phases.add(command.phase);
+        }
+      }
+
+      phaseFilter.innerHTML = `<option value="">All</option>`;
+      [...phases].sort().forEach(phase => {
+        const option = document.createElement("option");
+        option.value = phase;
+        option.textContent = phase;
+        phaseFilter.appendChild(option);
+      });
+      phaseFilter.value = phases.has(previous) ? previous : "";
+    }
+
+    function renderDevices(log) {
+      if (!log) {
+        return;
+      }
+
+      const selectedPhase = phaseFilter.value;
+      const devices = Object.values(log.devices || {});
+      devicesContainer.innerHTML = "";
+
+      for (const device of devices) {
+        const commands = (device.commands || []).filter(command => {
+          return !selectedPhase || command.phase === selectedPhase;
+        });
+        devicesContainer.appendChild(renderDevice(device, commands));
+      }
+    }
+
+    function renderDevice(device, commands) {
+      const details = document.createElement("details");
+      details.open = true;
+      details.innerHTML = `
+        <summary>
+          <span class="summary-title">
+            <span class="port"></span>
+            <span class="pill"></span>
+            <span class="pill command-count"></span>
+          </span>
+        </summary>
+        <div class="device-body">
+          <div class="commands"></div>
+        </div>
+      `;
+
+      details.querySelector(".port").textContent = device.port || "Unknown";
+      const statusPill = details.querySelector(".pill");
+      statusPill.textContent = device.status || "UNKNOWN";
+      statusPill.classList.add(statusClass(device.status));
+      details.querySelector(".command-count").textContent = `${commands.length} command${commands.length === 1 ? "" : "s"}`;
+
+      const commandsContainer = details.querySelector(".commands");
+      if (commands.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No commands match the current filter.";
+        commandsContainer.appendChild(empty);
+      } else {
+        commands.forEach(command => commandsContainer.appendChild(renderCommand(command)));
+      }
+      return details;
+    }
+
+    function renderCommand(command) {
+      const details = document.createElement("details");
+      details.className = "command";
+      details.open = true;
+      details.innerHTML = `
+        <summary>
+          <span class="summary-title">
+            <span class="port"></span>
+            <span class="pill"></span>
+            <span class="pill elapsed"></span>
+            <span class="pill bytes"></span>
+          </span>
+        </summary>
+        <div class="command-body"></div>
+      `;
+
+      details.querySelector(".port").textContent = command.command || "(startup)";
+      const statusPill = details.querySelector(".pill");
+      statusPill.textContent = `${command.phase || ""} ${command.status || "UNKNOWN"}`.trim();
+      statusPill.classList.add(statusClass(command.status));
+      details.querySelector(".elapsed").textContent = `${command.elapsed_seconds ?? 0}s`;
+      details.querySelector(".bytes").textContent = `${command.response_bytes ?? 0} bytes`;
+
+      const body = details.querySelector(".command-body");
+      if (command.error) {
+        const error = document.createElement("pre");
+        error.textContent = command.error;
+        body.appendChild(error);
+      }
+
+      const fields = renderFields(command.response_fields || {});
+      const lines = renderLines(command.response_text || []);
+      if (!showFields.checked) {
+        body.appendChild(lines);
+      } else if (viewMode.value === "lines") {
+        body.appendChild(lines);
+        body.appendChild(fields);
+      } else {
+        body.appendChild(fields);
+        body.appendChild(lines);
+      }
+
+      return details;
+    }
+
+    function renderFields(fields) {
+      const wrapper = document.createElement("section");
+      const entries = Object.entries(fields);
+      if (entries.length === 0) {
+        wrapper.className = "empty";
+        wrapper.textContent = "No parsed fields.";
+        return wrapper;
+      }
+
+      wrapper.className = "grid";
+      for (const [key, value] of entries) {
+        const node = document.createElement("article");
+        node.className = "field";
+        node.innerHTML = `<div class="key"></div><div class="value"></div>`;
+        node.querySelector(".key").textContent = key;
+        node.querySelector(".value").textContent = Array.isArray(value) ? value.join("\n") : String(value);
+        wrapper.appendChild(node);
+      }
+      return wrapper;
+    }
+
+    function renderLines(lines) {
+      const pre = document.createElement("pre");
+      pre.textContent = Array.isArray(lines) ? lines.join("\n") : String(lines || "");
+      return pre;
+    }
+
+    function setAllDetails(open) {
+      document.querySelectorAll("details").forEach(details => {
+        details.open = open;
+      });
+    }
+
+    function applyTheme(theme) {
+      const dark = theme === "dark";
+      document.body.classList.toggle("dark", dark);
+      themeToggle.textContent = dark ? "Light Mode" : "Dark Mode";
+    }
+
+    function statusClass(status) {
+      const normalized = String(status || "").toLowerCase();
+      if (normalized === "ok") {
+        return "ok";
+      }
+      if (normalized === "timeout") {
+        return "timeout";
+      }
+      return normalized ? "error" : "";
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "";
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+      return date.toLocaleString();
+    }
+  </script>
+</body>
+</html>

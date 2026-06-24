@@ -107,19 +107,20 @@ To skip the confirmation prompt:
 python serial_configure.py --config device_configure.json --yes
 ```
 
+To configure without opening the browser:
+
+```bash
+python serial_configure.py --config device_configure.json --no-viewer
+```
+
 The script sends a blank line first and waits for the `# SGS` prompt before applying settings. It then runs verification commands and writes:
 
 ```text
 logs/configure_log_YYYYMMDD_HHMMSS.json
+logs/configure_log_YYYYMMDD_HHMMSS_viewer.html
 ```
 
-After verification, the terminal prints a summary for each device:
-
-- `Version`
-- `Model Number`
-- `High Current Cal Factor 650A`
-- `GNSS status`
-- `Database designation`
+Open the `_viewer.html` file to scan the captured apply and verify command responses. The configure viewer does not analyze, select, or confirm fields; it is only for readable review and posterity.
 
 ### `device_configure.json`
 
@@ -136,18 +137,19 @@ Important fields:
 
 ## Build Timeline Report
 
-Use `build_timeline.py` to correlate condensed test spreadsheet data with all serial JSON logs.
+Use `build_timeline.py` to correlate condensed test spreadsheet data with all serial and configure JSON logs. Point it at a folder and it scans recursively.
 
 ```bash
-python build_timeline.py
+python build_timeline.py .
 start timeline_report.html
 ```
 
-The default inputs are:
+Folder mode looks for:
 
 ```text
 condensedTestResults.csv
-logs/serial_log_*.json
+**/serial_log_*.json
+**/configure_log_*.json
 ```
 
 The generated outputs are:
@@ -160,7 +162,8 @@ timeline_report.html
 The report shows a scaled timeline across the full test/log time range:
 
 - `T` markers for spreadsheet test timestamps.
-- `L` markers for serial log timestamps.
+- `L` markers for collection log timestamps.
+- `C` markers for configure log timestamps.
 - Hover quickviews for fast inspection.
 - Click-to-expand details in the side panel.
 - Device filtering by IMEI.
@@ -204,7 +207,7 @@ python serial_at_test.py --config collection_config.json
 4. Rebuild the timeline:
 
 ```bash
-python build_timeline.py
+python build_timeline.py .
 start timeline_report.html
 ```
 
