@@ -431,7 +431,7 @@
   <header>
     <div class="topbar">
       <div>
-        <h1>Serial Timeline Report</h1>
+        <h1 id="reportTitle">Serial Timeline Report</h1>
         <div id="subtitle" class="subtitle">Loading timeline data...</div>
       </div>
       <div class="actions">
@@ -488,6 +488,7 @@
   <script>
     // TIMELINE_DATA
     const app = document.getElementById("app");
+    const reportTitle = document.getElementById("reportTitle");
     const subtitle = document.getElementById("subtitle");
     const layoutMode = document.getElementById("layoutMode");
     const deviceFilter = document.getElementById("deviceFilter");
@@ -531,8 +532,15 @@
     }
 
     function initialize() {
+      setReportTitle();
       populateDeviceFilter();
       render();
+    }
+
+    function setReportTitle() {
+      const title = window.TIMELINE_DATA.title || "Serial Timeline Report";
+      document.title = title;
+      reportTitle.textContent = title;
     }
 
     function render() {

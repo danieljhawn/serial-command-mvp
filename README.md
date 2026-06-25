@@ -141,23 +141,27 @@ Use `build_timeline.py` to correlate condensed test spreadsheet data with all se
 
 ```bash
 python build_timeline.py .
-start timeline_report.html
 ```
+
+The report opens in your browser automatically.
 
 Folder mode looks for:
 
 ```text
-condensedTestResults.csv
+condensedTestResults.csv, or one CSV file directly in the chosen folder
 **/serial_log_*.json
 **/configure_log_*.json
 ```
 
-The generated outputs are:
+The generated output filenames are based on the logs' `test_suite` value:
 
 ```text
-timeline_index.json
-timeline_report.html
+<test_suite>_timeline_index.json
+<test_suite>_timeline_report.html
 ```
+
+If there are multiple CSV files directly in the folder, pass `--csv` so the builder does not guess.
+Use `--no-viewer` if you only want to generate the files without opening the browser.
 
 The report shows a scaled timeline across the full test/log time range:
 
@@ -208,7 +212,6 @@ python serial_at_test.py --config collection_config.json
 
 ```bash
 python build_timeline.py .
-start timeline_report.html
 ```
 
 ## Notes
