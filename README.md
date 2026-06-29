@@ -29,6 +29,12 @@ python serial_at_test.py --config collection_config.json
 
 This reads `collection_config.json`, asks which configured test sequence is being collected, opens all listed COM ports in parallel, sends each command, waits for the `# SGS` prompt, writes a JSON log to `logs/`, generates a matching `_viewer.html`, and opens it in your browser.
 
+To run one command as a status check instead of associating it with a test sequence:
+
+```bash
+python serial_at_test.py --config collection_config.json --status-check sta
+```
+
 To choose a sequence without the prompt:
 
 ```bash

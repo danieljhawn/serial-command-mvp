@@ -468,9 +468,16 @@
 
     function renderHeader(log) {
       const testSuite = log.test_suite || log.settings?.test_suite || "Serial Log Viewer";
+      const runType = log.run_type || log.settings?.run_type || "collection";
+      const statusCheckCommand = log.status_check_command || log.settings?.status_check_command || "";
       const selectedSequence = log.selected_sequence || {};
       pageTitle.textContent = testSuite;
-      if (selectedSequence.name) {
+      if (runType === "status_check") {
+        pageSequence.textContent = statusCheckCommand ? `Status Check: ${statusCheckCommand}` : "Status Check";
+        pageSequence.classList.remove("hidden");
+        pageSequenceDuration.textContent = "";
+        pageSequenceDuration.classList.add("hidden");
+      } else if (selectedSequence.name) {
         pageSequence.textContent = selectedSequence.name;
         pageSequence.classList.remove("hidden");
         pageSequenceDuration.textContent = selectedSequence.value

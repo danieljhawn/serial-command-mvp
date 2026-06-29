@@ -19,6 +19,8 @@ VIEWER_PATH = Path(__file__).with_name("log_viewer.html")
 @dataclass(frozen=True)
 class SerialConfig:
     test_suite: str
+    run_type: str
+    status_check_command: str
     selected_sequence_name: str
     selected_sequence_value: str
     ports: list[str]
@@ -40,6 +42,8 @@ class ThreadSafeJsonLogger:
             "started_at": timestamp(),
             "finished_at": None,
             "test_suite": config.test_suite,
+            "run_type": config.run_type,
+            "status_check_command": config.status_check_command,
             "selected_sequence": {
                 "name": config.selected_sequence_name,
                 "value": config.selected_sequence_value,
@@ -47,6 +51,8 @@ class ThreadSafeJsonLogger:
             "config_path": str(config_path),
             "settings": {
                 "test_suite": config.test_suite,
+                "run_type": config.run_type,
+                "status_check_command": config.status_check_command,
                 "selected_sequence": config.selected_sequence_name,
                 "baud": config.baud,
                 "timeout": config.timeout,
@@ -110,6 +116,11 @@ def parse_args() -> argparse.Namespace:
         help="Test sequence name from collection_config.json to associate with this run.",
     )
     parser.add_argument(
+        "--status-check",
+        metavar="COMMAND",
+        help="Run one command as a status check instead of associating the run with a test sequence.",
+    )
+    parser.add_argument(
         "--list-sequences",
         action="store_true",
         help="List configured test sequences and exit.",
@@ -126,13 +137,14 @@ def load_raw_config(path: Path) -> dict[str, Any]:
         raise ValueError(f"Invalid JSON config '{path}': {exc}") from None
 
 
-def load_config(path: Path, sequence_name: str = "") -> SerialConfig:
+def load_config(path: Path, sequence_name: str = "", status_check_command: str = "") -> SerialConfig:
     raw_config = load_raw_config(path)
     ports = require_string_list(raw_config, "ports")
-    commands = require_string_list(raw_config, "commands")
+    commands = [status_check_command] if status_check_command else require_string_list(raw_config, "commands")
     test_sequences = get_test_sequences(raw_config)
     selected_sequence_name = sequence_name
     selected_sequence_value = ""
+    run_type = "status_check" if status_check_command else "collection"
 
     if selected_sequence_name:
         if selected_sequence_name not in test_sequences:
@@ -153,6 +165,8 @@ def load_config(path: Path, sequence_name: str = "") -> SerialConfig:
 
     return SerialConfig(
         test_suite=str(raw_config.get("test_suite", "Serial Log Viewer")),
+        run_type=run_type,
+        status_check_command=status_check_command,
         selected_sequence_name=selected_sequence_name,
         selected_sequence_value=selected_sequence_value,
         ports=ports,
@@ -502,13 +516,17 @@ def main() -> int:
     args = parse_args()
     config_path = Path(args.config).resolve()
 
+    if args.status_check and args.sequence:
+        print("ERROR: Use either --status-check or --sequence, not both.", file=sys.stderr)
+        return 1
+
     try:
         raw_config = load_raw_config(config_path)
         if args.list_sequences:
             print_sequences(raw_config)
             return 0
-        selected_sequence = choose_sequence(raw_config, args.sequence or "")
-        config = load_config(config_path, selected_sequence)
+        selected_sequence = "" if args.status_check else choose_sequence(raw_config, args.sequence or "")
+        config = load_config(config_path, selected_sequence, args.status_check or "")
     except ValueError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
@@ -529,6 +547,8 @@ def main() -> int:
 
     print(f"Writing log to {log_path}")
     print(f"Polling {len(config.ports)} port(s): {', '.join(config.ports)}")
+    if config.run_type == "status_check":
+        print(f"Status check: {config.status_check_command}")
     if config.selected_sequence_name:
         print(f"Sequence: {config.selected_sequence_name}")
 
