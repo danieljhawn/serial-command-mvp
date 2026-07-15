@@ -167,11 +167,12 @@
     .timeline-scroll {
       overflow-x: auto;
       padding: 10px;
+      width: 100%;
     }
 
     .timeline {
       position: relative;
-      min-width: 1200px;
+      min-width: 100%;
       height: 500px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -243,20 +244,49 @@
       white-space: nowrap;
     }
 
+    .gap-break {
+      position: absolute;
+      top: 36px;
+      bottom: 24px;
+      width: 2px;
+      transform: translateX(-50%);
+      border-left: 2px dashed var(--muted);
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .gap-break span {
+      position: absolute;
+      top: 0;
+      left: 8px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      font-size: 10px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
     .marker {
       position: absolute;
-      width: 22px;
-      height: 22px;
+      min-width: 34px;
+      min-height: 26px;
+      padding: 4px 10px;
       transform: translate(-50%, -50%);
       border: 2px solid var(--panel);
-      border-radius: 50%;
+      border-radius: 999px;
       box-shadow: 0 2px 8px var(--shadow);
       cursor: pointer;
-      display: grid;
-      place-items: center;
+      display: block;
       color: #fff;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 900;
+      line-height: 1.15;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       z-index: 2;
     }
 
@@ -268,6 +298,19 @@
       background: var(--log);
     }
 
+    .marker.log.state-sleep {
+      background: var(--log);
+    }
+
+    .marker.log.state-pfault {
+      background: var(--bad);
+    }
+
+    .marker.log.state-warning {
+      background: var(--configure);
+      color: #1f1a00;
+    }
+
     .marker.configure {
       background: var(--configure);
     }
@@ -277,8 +320,7 @@
     }
 
     .marker.selected {
-      width: 30px;
-      height: 30px;
+      min-height: 32px;
       outline: 3px solid var(--accent);
       z-index: 4;
     }
@@ -453,6 +495,13 @@
             </select>
           </label>
           <label>
+            Time Scale
+            <select id="timeScaleMode">
+              <option value="compressed">Compress Gaps</option>
+              <option value="actual">Actual Time</option>
+            </select>
+          </label>
+          <label>
             Search
             <input id="searchInput" type="search" placeholder="fault, IMEI, note...">
           </label>
@@ -492,6 +541,7 @@
     const subtitle = document.getElementById("subtitle");
     const layoutMode = document.getElementById("layoutMode");
     const deviceFilter = document.getElementById("deviceFilter");
+    const timeScaleMode = document.getElementById("timeScaleMode");
     const searchInput = document.getElementById("searchInput");
     const themeToggle = document.getElementById("themeToggle");
     const showAll = document.getElementById("showAll");
@@ -510,6 +560,7 @@
       render();
     });
     deviceFilter.addEventListener("change", render);
+    timeScaleMode.addEventListener("change", render);
     searchInput.addEventListener("input", render);
     showAll.addEventListener("click", () => {
       restrictToTestWindow = false;
@@ -546,9 +597,10 @@
     function render() {
       const events = filteredEvents();
       const bounds = timelineBounds(events);
-      subtitle.textContent = `${countKind(events, "test")} tests | ${countKind(events, "log")} collection logs | ${countKind(events, "configure")} configure logs | ${formatDate(bounds.start)} to ${formatDate(bounds.end)}`;
+      const scale = buildTimeScale(events, bounds);
+      subtitle.textContent = `${countKind(events, "test")} tests | ${countKind(events, "log")} collection logs | ${countKind(events, "configure")} configure logs | ${formatDate(bounds.start)} to ${formatDate(bounds.end)}${scale.gaps.length ? ` | ${scale.gaps.length} gap(s) compressed` : ""}`;
       timelineCount.textContent = `${events.length} events`;
-      renderTimeline(events, bounds);
+      renderTimeline(events, scale);
       if (selectedEventId) {
         const selected = events.find(event => event.id === selectedEventId);
         if (selected) {
@@ -560,10 +612,11 @@
       }
     }
 
-    function renderTimeline(events, bounds) {
+    function renderTimeline(events, scale) {
       timeline.innerHTML = "";
-      const duration = Math.max(1, bounds.end - bounds.start);
-      const width = Math.max(1200, Math.round(duration / 60000) * 10);
+      const duration = Math.max(1, scale.end - scale.start);
+      const containerWidth = timeline.parentElement?.clientWidth || 1200;
+      const width = Math.max(containerWidth - 20, Math.round(duration / 60000) * 10);
       timeline.style.width = `${width}px`;
       timeline.style.setProperty("--grid-step", `${Math.max(80, width / 10)}px`);
       addAxis("test-axis");
@@ -572,12 +625,14 @@
       addLaneLabel("Tests", "test-label");
       addLaneLabel("Collection Logs", "log-label");
       addLaneLabel("Configure Logs", "configure-label");
-      addTicks(bounds, width);
+      addTicks(scale, width);
+      addGapMarkers(scale, width);
 
       const laneOffsets = { test: 132, log: 260, configure: 400 };
       const stacks = {};
       events.forEach(event => {
-        const x = 28 + ((new Date(event.timestamp).getTime() - bounds.start) / duration) * (width - 56);
+        const projectedTime = scale.project(new Date(event.timestamp).getTime());
+        const x = 28 + ((projectedTime - scale.start) / duration) * (width - 56);
         const stackKey = `${event.kind}-${Math.round(x / 24)}`;
         const stackIndex = stacks[stackKey] || 0;
         stacks[stackKey] = stackIndex + 1;
@@ -590,6 +645,10 @@
       const marker = document.createElement("button");
       marker.type = "button";
       marker.className = `marker ${event.kind}`;
+      const stateClass = markerStateClass(event);
+      if (stateClass) {
+        marker.classList.add(stateClass);
+      }
       if (event.error_count) {
         marker.classList.add("error");
       }
@@ -599,6 +658,7 @@
       marker.style.left = `${x}px`;
       marker.style.top = `${y}px`;
       marker.textContent = markerLabel(event);
+      marker.title = `${event.kind}: ${event.title || markerLabel(event)}`;
       marker.setAttribute("aria-label", `${event.kind}: ${event.title}`);
       marker.addEventListener("mouseenter", mouseEvent => showQuickview(event, mouseEvent));
       marker.addEventListener("mousemove", moveQuickview);
@@ -624,19 +684,38 @@
       timeline.appendChild(label);
     }
 
-    function addTicks(bounds, width) {
+    function addTicks(scale, width) {
       const tickCount = 10;
       for (let index = 0; index <= tickCount; index += 1) {
         const x = 28 + (index / tickCount) * (width - 56);
-        const time = new Date(bounds.start + (index / tickCount) * (bounds.end - bounds.start));
+        const projectedTime = scale.start + (index / tickCount) * (scale.end - scale.start);
+        const time = new Date(scale.unproject(projectedTime));
         const tick = document.createElement("div");
         tick.className = "tick";
         tick.style.left = `${x}px`;
         const label = document.createElement("span");
-        label.textContent = time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        label.textContent = time.toLocaleString([], { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
         tick.appendChild(label);
         timeline.appendChild(tick);
       }
+    }
+
+    function addGapMarkers(scale, width) {
+      if (!scale.gaps.length) {
+        return;
+      }
+      const duration = Math.max(1, scale.end - scale.start);
+      scale.gaps.forEach(gap => {
+        const projectedMidpoint = (scale.project(gap.start) + scale.project(gap.end)) / 2;
+        const x = 28 + ((projectedMidpoint - scale.start) / duration) * (width - 56);
+        const marker = document.createElement("div");
+        marker.className = "gap-break";
+        marker.style.left = `${x}px`;
+        const label = document.createElement("span");
+        label.textContent = `gap ${formatDuration((gap.length - gap.cap) / 1000)}`;
+        marker.appendChild(label);
+        timeline.appendChild(marker);
+      });
     }
 
     function renderDetail(event) {
@@ -649,7 +728,7 @@
           <div class="device-grid"></div>
         `;
         detailBody.querySelector(".time").textContent = formatDate(event.timestamp);
-        detailBody.querySelector(".title").textContent = event.title || "Untitled test";
+        detailBody.querySelector(".title").textContent = event.display_sequence || event.title || "Untitled test";
         const pills = detailBody.querySelector(".pill-row");
         addPill(pills, "test");
         addPill(pills, `Expected: ${event.expected_result || "n/a"}`);
@@ -676,6 +755,13 @@
       addPill(pills, event.error_count ? `${event.error_count} errors` : "OK", event.error_count ? "error" : "ok");
       addPill(pills, event.position_label || "unmatched");
       addPill(pills, `Commands: ${(event.commands || []).join(", ")}`);
+      if (event.kind === "log") {
+        const newEventCount = (event.devices || []).reduce(
+          (total, device) => total + (device.new_event_log_entries || []).length,
+          0
+        );
+        addPill(pills, `${newEventCount} new event log entr${newEventCount === 1 ? "y" : "ies"}`);
+      }
       if (event.viewer_file) {
         const link = document.createElement("a");
         link.href = event.viewer_file;
@@ -683,20 +769,42 @@
         pills.appendChild(link);
       }
       const grid = detailBody.querySelector(".device-grid");
+      const portAliases = buildPortAliases();
       (event.devices || []).forEach(device => {
         grid.appendChild(renderDeviceValue(
-          device.imei || device.port,
-          [
-            device.port,
-            device.status,
-            device.state ? `State: ${device.state}` : "",
-            device.signal ? `Signal: ${device.signal}` : "",
-            device.pfault_count ? `PFault: ${device.pfault_count}` : "",
-            device.tfault_count ? `TFault: ${device.tfault_count}` : "",
-            device.wdt_resets ? `WDT: ${device.wdt_resets}` : "",
-          ].filter(Boolean).join("\n")
+          deviceDisplayName(device, portAliases),
+          renderDeviceEventDelta(device)
         ));
       });
+    }
+
+    function renderDeviceEventDelta(device) {
+      const newEntries = device.new_event_log_entries || [];
+      const lines = [
+        device.port,
+        device.status,
+        device.state ? `State: ${device.state}` : "",
+      ].filter(Boolean);
+
+      if ((device.thresholds || []).length) {
+        lines.push("Thresholds:");
+        device.thresholds.forEach(threshold => {
+          lines.push(`- ${threshold}`);
+        });
+      }
+
+      if (!device.previous_event_log_seen) {
+        lines.push("New Events: no previous check");
+      } else if (!newEntries.length) {
+        lines.push("New Events: none");
+      } else {
+        lines.push("New Events:");
+        newEntries.forEach(entry => {
+          lines.push(`- ${entry.id}: ${entry.text}`);
+        });
+      }
+
+      return lines.join("\n");
     }
 
     function clearDetail() {
@@ -746,12 +854,41 @@
 
     function markerLabel(event) {
       if (event.kind === "test") {
-        return "T";
+        return event.display_sequence || event.title || "Test";
       }
       if (event.kind === "configure") {
-        return "C";
+        return "Configure";
       }
-      return "L";
+      return summarizeEventState(event).label;
+    }
+
+    function markerStateClass(event) {
+      if (event.kind !== "log") {
+        return "";
+      }
+      return `state-${summarizeEventState(event).severity}`;
+    }
+
+    function summarizeEventState(event) {
+      const states = (event.devices || [])
+        .map(device => String(device.state || "").trim())
+        .filter(Boolean);
+      if (!states.length) {
+        return { label: "Log", severity: "warning" };
+      }
+
+      const normalized = states.map(state => state.toLowerCase());
+      const pfault = states.find((state, index) => normalized[index].includes("pfault"));
+      if (pfault) {
+        return { label: pfault, severity: "pfault" };
+      }
+
+      const nonSleep = states.find((state, index) => normalized[index] !== "sleep");
+      if (nonSleep) {
+        return { label: nonSleep, severity: "warning" };
+      }
+
+      return { label: "Sleep", severity: "sleep" };
     }
 
     function renderDeviceValue(name, value) {
@@ -791,11 +928,12 @@
       });
     }
 
-    function eventHasDevice(event, imei) {
+    function eventHasDevice(event, deviceId) {
       if (event.kind === "test") {
-        return imei in (event.device_results || {});
+        return true;
       }
-      return (event.devices || []).some(device => device.imei === imei);
+      const portAliases = buildPortAliases();
+      return (event.devices || []).some(device => deviceFilterId(device, portAliases) === deviceId);
     }
 
     function timelineBounds(events) {
@@ -811,6 +949,74 @@
       return { start: start - padding, end: end + padding };
     }
 
+    function buildTimeScale(events, bounds) {
+      const compress = timeScaleMode.value === "compressed";
+      const gapThreshold = 2 * 60 * 60 * 1000;
+      const gapCap = 30 * 60 * 1000;
+      const times = [...new Set(
+        events
+          .map(event => new Date(event.timestamp).getTime())
+          .filter(Number.isFinite)
+          .sort((left, right) => left - right)
+      )];
+      const gaps = [];
+      if (compress) {
+        for (let index = 1; index < times.length; index += 1) {
+          const previous = times[index - 1];
+          const current = times[index];
+          const length = current - previous;
+          if (length > gapThreshold) {
+            gaps.push({
+              start: previous,
+              end: current,
+              length,
+              cap: gapCap,
+              reduction: length - gapCap,
+            });
+          }
+        }
+      }
+
+      function project(time) {
+        let reduction = 0;
+        for (const gap of gaps) {
+          if (time <= gap.start) {
+            return time - reduction;
+          }
+          const projectedStart = gap.start - reduction;
+          if (time < gap.end) {
+            return projectedStart + ((time - gap.start) / gap.length) * gap.cap;
+          }
+          reduction += gap.reduction;
+        }
+        return time - reduction;
+      }
+
+      function unproject(projectedTime) {
+        let reduction = 0;
+        for (const gap of gaps) {
+          const projectedStart = gap.start - reduction;
+          const projectedEnd = projectedStart + gap.cap;
+          if (projectedTime < projectedStart) {
+            return projectedTime + reduction;
+          }
+          if (projectedTime <= projectedEnd) {
+            return gap.start + ((projectedTime - projectedStart) / gap.cap) * gap.length;
+          }
+          reduction += gap.reduction;
+        }
+        return projectedTime + reduction;
+      }
+
+      return {
+        start: project(bounds.start),
+        end: project(bounds.end),
+        gaps,
+        project,
+        unproject,
+      };
+    }
+
     function getTestWindow() {
       const tests = window.TIMELINE_DATA.tests || [];
       const times = tests.map(test => new Date(test.timestamp).getTime()).filter(Number.isFinite);
@@ -824,23 +1030,60 @@
     }
 
     function populateDeviceFilter() {
-      const devices = new Set();
+      const devices = new Map();
+      const portAliases = buildPortAliases();
       for (const test of window.TIMELINE_DATA.tests || []) {
-        Object.keys(test.device_results || {}).forEach(imei => devices.add(imei));
+        Object.keys(test.device_results || {}).forEach(imei => addDeviceOption(devices, imei, imei));
       }
       for (const log of window.TIMELINE_DATA.logs || []) {
         for (const device of log.devices || []) {
-          if (device.imei) {
-            devices.add(device.imei);
+          addDeviceOption(
+            devices,
+            deviceFilterId(device, portAliases),
+            deviceDisplayName(device, portAliases)
+          );
+        }
+      }
+      [...devices.entries()].sort((left, right) => left[1].localeCompare(right[1])).forEach(([id, label]) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = label;
+        deviceFilter.appendChild(option);
+      });
+    }
+
+    function addDeviceOption(devices, id, label) {
+      if (!id) {
+        return;
+      }
+      if (!devices.has(id) || String(label).length > String(devices.get(id)).length) {
+        devices.set(id, label);
+      }
+    }
+
+    function buildPortAliases() {
+      const aliases = new Map();
+      for (const log of window.TIMELINE_DATA.logs || []) {
+        for (const device of log.devices || []) {
+          if (device.port && device.imei) {
+            aliases.set(device.port, device.imei);
           }
         }
       }
-      [...devices].sort().forEach(imei => {
-        const option = document.createElement("option");
-        option.value = imei;
-        option.textContent = imei;
-        deviceFilter.appendChild(option);
-      });
+      return aliases;
+    }
+
+    function deviceFilterId(device, portAliases = buildPortAliases()) {
+      return device.imei || portAliases.get(device.port) || device.port || "";
+    }
+
+    function deviceDisplayName(device, portAliases = buildPortAliases()) {
+      const aliasedImei = device.imei || portAliases.get(device.port);
+      if (aliasedImei) {
+        return aliasedImei;
+      }
+      const model = device.model ? ` ${device.model}` : "";
+      return `${device.port || "Unknown port"}${model}`;
     }
 
     function countKind(events, kind) {
@@ -862,6 +1105,24 @@
         return value;
       }
       return date.toLocaleString();
+    }
+
+    function formatDuration(totalSeconds) {
+      const seconds = Math.max(0, Math.round(totalSeconds));
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      const parts = [];
+      if (hours) {
+        parts.push(`${hours}h`);
+      }
+      if (minutes) {
+        parts.push(`${minutes}m`);
+      }
+      if (remainingSeconds || !parts.length) {
+        parts.push(`${remainingSeconds}s`);
+      }
+      return parts.join(" ");
     }
   </script>
 </body>

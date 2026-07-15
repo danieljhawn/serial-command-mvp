@@ -647,7 +647,7 @@
         body.appendChild(error);
       }
 
-      const fields = renderFields(command.response_fields || {});
+      const fields = renderFields(displayFields(command));
       const lines = renderLines(command.response_text || []);
       if (!showFields.checked) {
         body.appendChild(lines);
@@ -681,6 +681,32 @@
         wrapper.appendChild(node);
       }
       return wrapper;
+    }
+
+    function displayFields(command) {
+      const fields = { ...(command.response_fields || {}) };
+      const state = extractDisplayState(command.response_text || [], fields.State || "");
+      if (state) {
+        fields.State = state;
+      }
+      return fields;
+    }
+
+    function extractDisplayState(lines, fallback) {
+      const textLines = Array.isArray(lines) ? lines.map(line => String(line).trim()) : [];
+      for (let index = 0; index < textLines.length; index += 1) {
+        const line = textLines[index];
+        if (!line.toLowerCase().startsWith("state:")) {
+          continue;
+        }
+        const state = line.split(":", 2)[1]?.trim() || fallback;
+        const nextLine = textLines[index + 1] || "";
+        if (nextLine.startsWith("*")) {
+          return nextLine.replace(/^\*+\s*/, "").trim();
+        }
+        return state;
+      }
+      return fallback;
     }
 
     function renderLines(lines) {

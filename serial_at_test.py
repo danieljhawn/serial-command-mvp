@@ -281,9 +281,12 @@ def clean_response_lines(response: bytes, prompt_prefix: str) -> list[str]:
 
 def parse_response_fields(lines: list[str]) -> dict[str, str | list[str]]:
     parsed: dict[str, str | list[str]] = {}
+    previous_key = ""
 
     for line in lines:
         if ":" not in line:
+            if previous_key == "State" and line.strip().startswith("*"):
+                parsed["State"] = line.strip().lstrip("*").strip()
             continue
 
         key, value = line.split(":", 1)
@@ -291,6 +294,7 @@ def parse_response_fields(lines: list[str]) -> dict[str, str | list[str]]:
         value = value.strip()
         if not key:
             continue
+        previous_key = key
         if key not in parsed:
             parsed[key] = value
             continue

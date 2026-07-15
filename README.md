@@ -178,6 +178,7 @@ The report shows a scaled timeline across the full test/log time range:
 - Click-to-expand details in the side panel.
 - Device filtering by IMEI.
 - Text search.
+- `Compress Gaps` and `Actual Time` timeline scale modes.
 - Dark mode.
 - `Split Detail` and `Wide Timeline` layouts.
 - Links from each log marker to its full individual log viewer.
