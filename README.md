@@ -187,6 +187,84 @@ These checks use simulated serial ports and temporary output folders. They cover
 CLI modes, config validation, startup cancellation, command errors/timeouts,
 log timing fields, and viewer generation without accessing connected devices.
 
+## Live Serial Monitor (experimental)
+
+The `feature/live-monitor` branch adds a desktop console that keeps every configured
+port open and continuously captures incoming data, even when no command is running:
+
+```powershell
+.\.venv\Scripts\python.exe serial_live_monitor.py
+```
+
+Use `--config PATH` to choose another collection config. It uses the existing
+ports, baud, timeout, prompt, line-ending, log-folder, and suite settings.
+The desktop window uses Python's bundled Tkinter; `pyserial` is the only external
+dependency. The existing one-shot collector remains available.
+
+1. Click **Start listening**. No commands are sent automatically, and serial input
+   buffers are not cleared. Boot messages and unsolicited data remain in the log.
+2. Enter one command or paste a list with one command per line. **Send command list**
+   sends each step to every device, with their writes coordinated together.
+   **Send sta** and **Send con** are quick actions. **Load configured commands**
+   fills the editor from `commands` without sending anything.
+3. Each device must return its configured prompt before the next command is sent
+   to any device. All configured devices must be connected before sending a list.
+   Only one list runs at a time. A timeout/error cancels the remaining commands;
+   a timed-out device stays open so late responses can still be captured.
+4. Use the device filter to inspect one device or all devices. **Follow latest**
+   controls automatic scrolling. The display keeps recent events; the disk log
+   preserves the whole session. Echoes, prompts, blank lines, and unexpected output
+   are included. `\r` represents carriage returns in the desktop display.
+5. Click **Stop & save report**, then **Open saved report**. Closing the window also
+   stops the session and saves the report. You can start another session afterward.
+
+Pre/post commands and test-sequence selection are not applied automatically in
+this mode. Only commands you explicitly send are transmitted. Commands may change
+device settings depending on what you enter. Synchronized writes are coordinated
+by software and are not guaranteed to occur at exactly the same physical instant.
+The monitor owns its COM ports while listening, so stop other serial tools using
+those same ports before connecting.
+
+Each session writes:
+
+```text
+logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+logs/live_serial_YYYYMMDD_HHMMSS_microseconds_viewer.html
+```
+
+The JSONL file is appended and flushed after each event, making already-written
+records available during capture. Logging errors stop capture and are surfaced in
+the window. This is a different event format from the collector JSON and is not
+currently imported into the timeline builder. Each record includes a unique
+increasing ID, local timestamp with timezone offset, port, and event type:
+
+- `tx` / `rx`: sent/received chunks, readable text, byte count, and exact bytes as
+  `bytes_base64`. Command sends also identify the command, batch, and step.
+- `command_result`: prompt completion, timeout, error, or cancellation.
+- `connection`, `batch_start`, `batch_end`, `session_start`, `session_end`, and
+  `error`: session and device activity.
+
+Timestamps reflect when the computer writes or reads data, not the device's
+internal event time. Reads may contain partial lines or several lines together.
+RX events retain batch/step context while a command is active, but unexpected
+messages can arrive during that command too; the log does not assert that all RX
+bytes are replies to that command. Completion uses the configured prompt, so a
+late prompt or unsolicited prompt-like line cannot be distinguished from a reply
+by this protocol alone. Before retrying a timed-out device, wait for it to settle.
+
+If the app is interrupted before creating the HTML report, regenerate it from
+the saved JSONL file without connecting to any devices:
+
+```powershell
+.\.venv\Scripts\python.exe serial_live_monitor.py --report logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+```
+
+Run both suites without connecting to hardware:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest -v test_serial_at_test test_live_serial
+```
+
 ## View Individual Logs
 
 Each collection run saves JSON and, unless `--no-viewer` is used, a matching HTML file:
