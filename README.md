@@ -43,6 +43,12 @@ For a quick `sta` status check without selecting a test sequence:
 python serial_at_test.py --sta
 ```
 
+To collect only `con` using the same shortcut behavior:
+
+```bash
+python serial_at_test.py --con
+```
+
 To choose a sequence without the prompt:
 
 ```bash
@@ -67,23 +73,24 @@ python serial_at_test.py --config collection_config.json --no-viewer
 | --- | --- | --- |
 | `--config PATH` | `collection_config.json` beside the script | Read settings from this file. A supplied relative path is resolved from your working folder. |
 | `--sta` | Off | Shortcut for `--status-check sta`. Collect `sta` on every configured port without selecting a sequence. |
+| `--con` | Off | Shortcut for `--status-check con`. Collect `con` on every configured port without selecting a sequence. |
 | `--status-check COMMAND` | Off | Replace the main command list with one command, such as `--status-check con`. No sequence is associated with the run. |
 | `--sequence "NAME"` | Interactive selection | Associate the run with an exact, case-sensitive configured name. Quote names containing spaces. |
 | `--list-sequences` | Off | Print configured names and sequence descriptions, then exit without opening ports or creating logs. |
 | `--no-viewer` | Off | Save JSON only; skip HTML generation and browser opening. |
 | `-h`, `--help` | Off | Show command-line help and exit without reading the config or opening ports. |
 
-Choose at most one of `--sta`, `--status-check`, `--sequence`, and `--list-sequences`.
+Choose at most one of `--sta`, `--con`, `--status-check`, `--sequence`, and `--list-sequences`.
 Combine your choice with `--config` and/or `--no-viewer` as needed:
 
 ```bash
 python serial_at_test.py --sta --no-viewer
-python serial_at_test.py --config collection_config.json --status-check con
+python serial_at_test.py --config collection_config.json --con
 ```
 
-Both status-check options still run configured `pre_commands` and `post_commands`.
+All status-check options still run configured `pre_commands` and `post_commands`.
 Only the main `commands` list is replaced. With your current empty pre/post lists,
-`--sta` sends just `sta`.
+`--sta` sends just `sta`, and `--con` sends just `con`.
 
 Test sequences are descriptive metadata: selecting one saves its name and
 current/time description in the log. The collector does not apply that waveform

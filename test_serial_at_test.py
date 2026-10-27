@@ -94,15 +94,34 @@ class CollectorTests(unittest.TestCase):
             self.assertEqual(record["timestamp"], record["completed_at"])
             self.assertLessEqual(record["sent_at"], record["completed_at"])
 
+    def test_con_collects_only_con_without_sequence_prompt(self):
+        self.raw["test_sequences"] = {"Example": "1s 10a"}
+        self.config_path.write_text(json.dumps(self.raw), encoding="utf-8")
+        devices = {port: FakeSerial() for port in self.raw["ports"]}
+        result, _, log = self.run_main(["--con", "--no-viewer"], devices)
+        self.assertEqual(result, 0)
+        self.assertEqual(log["run_type"], "status_check")
+        self.assertEqual(log["status_check_command"], "con")
+        self.assertEqual(log["selected_sequence"], {"name": "", "value": ""})
+        for device in devices.values():
+            self.assertEqual(device.writes, [b"con\r"])
+            self.assertTrue(device.closed)
+
     def test_status_shortcut_keeps_optional_hooks(self):
         self.raw.update(pre_commands=[""], post_commands=["eve"])
-        config = collector.load_config(self.raw, status_check_command="sta")
-        self.assertEqual(collector.command_plan(config), [("pre", ""), ("test", "sta"), ("post", "eve")])
+        for command in ("sta", "con"):
+            config = collector.load_config(self.raw, status_check_command=command)
+            self.assertEqual(
+                collector.command_plan(config),
+                [("pre", ""), ("test", command), ("post", "eve")],
+            )
         self.assertEqual(collector.parse_args(["--status-check", "con"]).status_check, "con")
 
     def test_conflicting_modes_and_blank_status_command_are_rejected(self):
         for flags in (["--sta", "--sequence", "Example"], ["--sta", "--status-check", "sta"],
-                      ["--sta", "--list-sequences"], ["--status-check", ""]):
+                      ["--sta", "--list-sequences"], ["--status-check", ""],
+                      ["--con", "--sta"], ["--con", "--sequence", "Example"],
+                      ["--con", "--status-check", "sta"], ["--con", "--list-sequences"]):
             with self.subTest(flags=flags), self.assertRaises(SystemExit) as raised:
                 collector.parse_args(flags)
             self.assertEqual(raised.exception.code, 2)

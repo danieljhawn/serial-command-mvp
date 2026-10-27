@@ -1,7 +1,7 @@
 """Collect serial evidence in parallel and save JSON logs with optional HTML views.
 
 Test sequences describe the test associated with a run; only the configured
-serial commands are sent to devices. Use --sta for a quick status collection.
+serial commands are sent to devices. Use --sta or --con for a quick collection.
 """
 
 import argparse
@@ -133,6 +133,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_const",
         const="sta",
         help="Collect sta without selecting a sequence; configured pre/post commands still run.",
+    )
+    run_mode.add_argument(
+        "--con",
+        dest="status_check",
+        action="store_const",
+        const="con",
+        help="Collect con without selecting a sequence; configured pre/post commands still run.",
     )
     run_mode.add_argument(
         "--status-check",
