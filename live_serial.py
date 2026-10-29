@@ -6,9 +6,13 @@ every port returns its prompt; failure cancels the remaining commands.
 """
 
 import base64
+import codecs
+from contextlib import ExitStack
 import html
 import json
 import queue
+import shutil
+import tempfile
 import threading
 import time
 from dataclasses import dataclass, field
@@ -17,6 +21,29 @@ from pathlib import Path
 from typing import Any, Callable
 
 from serial_at_test import SerialConfig, build_command_bytes, open_serial, prompt_has_returned, timestamp
+
+
+class SerialReplyDecoder:
+    """Join read chunks, split UTF-8 characters, and CRLF pairs for display.
+
+    CR, LF, and CRLF become normal line endings. No separators are added between
+    chunks, so the desktop and saved report show the same continuous replies.
+    """
+
+    def __init__(self):
+        self.decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+        self.after_cr = False
+
+    def feed(self, data: bytes, *, final: bool = False) -> str:
+        text = self.decoder.decode(data, final=final)
+        output = []
+        for char in text:
+            if char == "\n" and self.after_cr:
+                self.after_cr = False
+                continue
+            self.after_cr = char == "\r"
+            output.append("\n" if self.after_cr else char)
+        return "".join(output)
 
 
 class EventLog:
@@ -319,34 +346,139 @@ def event_text(event: dict[str, Any]) -> str:
     )
 
 
+def write_activity(output, event: dict[str, Any]) -> None:
+    """Keep status events timestamped without interrupting a device's replies."""
+    output.write("<tr>")
+    for value in (event["timestamp"], event["kind"], event_text(event)):
+        output.write(f"<td><pre>{html.escape(str(value))}</pre></td>")
+    output.write("</tr>\n")
+
+
+class DeviceReport:
+    """Spool each device's transcript to disk instead of holding a session in RAM."""
+
+    def __init__(self, transcript, activity):
+        self.transcript = transcript
+        self.activity = activity
+        self.decoder = SerialReplyDecoder()
+        self.at_line_start = True
+
+    def received(self, text: str, received_at: str = "") -> None:
+        if text:
+            title = html.escape(f"Received {received_at}", quote=True)
+            # Inline spans retain chunk timestamps on hover without introducing
+            # any whitespace into the device's visible text.
+            self.transcript.write(f'<span class="rx" title="{title}">{html.escape(text)}</span>')
+            self.at_line_start = text.endswith("\n")
+
+    def append(self, event: dict[str, Any]) -> None:
+        if event["kind"] == "rx":
+            data = (
+                base64.b64decode(event["bytes_base64"])
+                if "bytes_base64" in event else event["text"].encode("utf-8")
+            )
+            self.received(self.decoder.feed(data), event["timestamp"])
+        elif event["kind"] == "tx":
+            if not self.at_line_start:
+                self.transcript.write("\n")
+            command = event.get("command", event.get("text", "").rstrip("\r\n"))
+            marker = f"[{event['timestamp']}] >>> {command}\n"
+            self.transcript.write(f'<span class="tx">{html.escape(marker)}</span>')
+            self.at_line_start = True
+        else:
+            write_activity(self.activity, event)
+
+
 def create_report(log_path: Path) -> Path:
-    """Read JSONL incrementally so interrupted sessions can also be reviewed."""
+    """Build grouped, continuous transcripts from saved or interrupted sessions."""
     path = report_path(log_path)
-    with log_path.open(encoding="utf-8") as source, path.open("w", encoding="utf-8") as output:
-        output.write("""<!doctype html><html lang="en"><meta charset="utf-8">
+    with tempfile.TemporaryDirectory(prefix="serial_report_") as temporary, ExitStack() as stack:
+        folder = Path(temporary)
+        devices: dict[str, DeviceReport] = {}
+        session_activity = stack.enter_context((folder / "session.html").open("w+", encoding="utf-8"))
+        incomplete = 0
+
+        def device_for(port: str) -> DeviceReport:
+            if port not in devices:
+                index = len(devices)
+                transcript = stack.enter_context((folder / f"{index}_text.html").open("w+", encoding="utf-8"))
+                activity = stack.enter_context((folder / f"{index}_activity.html").open("w+", encoding="utf-8"))
+                devices[port] = DeviceReport(transcript, activity)
+            return devices[port]
+
+        with log_path.open(encoding="utf-8") as source:
+            for line in source:
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    incomplete += 1
+                    continue
+                if event["kind"] == "session_start":
+                    for port in event.get("ports", []):
+                        device_for(port)
+                if event.get("port"):
+                    device_for(event["port"]).append(event)
+                else:
+                    write_activity(session_activity, event)
+
+        with path.open("w", encoding="utf-8") as output:
+            output.write("""<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Live serial session</title><style>
-body{font:15px system-ui;background:#101820;color:#e7eef5;padding:24px}
-table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px;
-border-bottom:1px solid #304252;vertical-align:top}th{position:sticky;top:0;background:#101820}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:13px Consolas,monospace}
-.tx{color:#80d9ff}.rx{color:#a6e2a0}.error,.command_result{color:#f4cd80}
+*{box-sizing:border-box}
+body{font:15px system-ui;background:#101820;color:#e7eef5;padding:24px;margin:0}
+a{color:#80d9ff}nav{display:flex;flex-wrap:wrap;gap:16px;margin:24px 0}
+#devices{display:flex;flex-wrap:wrap;gap:10px;--columns:1;margin:24px 0}
+.device{flex:1 1 calc((100% - (var(--columns) - 1) * 10px) / var(--columns));
+max-width:100%;background:#16232f;border:1px solid #304252;border-radius:8px;padding:18px;
+scroll-margin-top:16px;min-width:0}h2{margin-top:0}
+.transcript{white-space:pre;overflow:auto;padding:16px;background:#101820;
+font:13px/1.5 Consolas,monospace;tab-size:8}.rx{color:#a6e2a0}.tx{color:#80d9ff}
+details{margin:16px 0}summary{cursor:pointer}table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #304252;vertical-align:top}
+td pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:13px Consolas,monospace}
+.notice{color:#f4cd80}
 </style><h1>Live serial session</h1>
-<p>Times show when the computer sent or read bytes. RX includes unsolicited output,
-echoes, blank lines, and prompts. Rows are received chunks, not necessarily whole lines.
-Exact bytes are preserved as base64 in the JSONL log.</p>""")
-        output.write(f"<p>Source: {html.escape(log_path.name)}</p>")
-        output.write("<table><thead><tr><th>Time</th><th>Port</th><th>Event</th><th>Content</th></tr></thead><tbody>")
-        for line in source:
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                output.write('<tr><td colspan="4">Incomplete log record skipped.</td></tr>')
-                continue
-            kind = html.escape(event["kind"], quote=True)
-            values = (event["timestamp"], event.get("port", ""), event["kind"].upper(), event_text(event))
-            output.write(f'<tr class="{kind}">')
-            for value in values:
-                output.write(f"<td><pre>{html.escape(str(value))}</pre></td>")
-            output.write("</tr>\n")
-        output.write("</tbody></table></html>")
+<p>Replies are grouped by device with their original line breaks. Blue markers show
+sent commands and timestamps. Hover over received text to see its capture timestamp.
+Exact bytes and every chunk timestamp remain in the JSONL log.</p>""")
+            output.write(f"<p>Source: {html.escape(log_path.name)}</p>")
+            if incomplete:
+                output.write(f'<p class="notice">Incomplete log record skipped. Skipped records: {incomplete}.</p>')
+            output.write('<nav aria-label="Devices">')
+            for index, port in enumerate(devices):
+                output.write(f'<a href="#device-{index}">{html.escape(port)}</a>')
+            output.write('</nav><div id="devices">')
+            for index, (port, device) in enumerate(devices.items()):
+                device.received(device.decoder.feed(b"", final=True))
+                output.write(f'<section class="device" id="device-{index}"><h2>{html.escape(port)}</h2>')
+                output.write('<pre class="transcript">')
+                device.transcript.seek(0)
+                shutil.copyfileobj(device.transcript, output)
+                output.write("</pre><details><summary>Device activity and command results</summary>")
+                output.write("<table><thead><tr><th>Time</th><th>Event</th><th>Details</th></tr></thead><tbody>")
+                device.activity.seek(0)
+                shutil.copyfileobj(device.activity, output)
+                output.write("</tbody></table></details></section>")
+            output.write("</div><details><summary>Session activity</summary><table><thead><tr>")
+            output.write("<th>Time</th><th>Event</th><th>Details</th></tr></thead><tbody>")
+            session_activity.seek(0)
+            shutil.copyfileobj(session_activity, output)
+            output.write("""</tbody></table></details><script>
+function updateDeviceColumns() {
+  const devices = document.getElementById("devices");
+  const count = devices.children.length;
+  if (!count) return;
+  const maxColumns = Math.max(1, Math.floor((devices.clientWidth + 10) / 370));
+  let columns = Math.min(count, maxColumns);
+  if (count % 2 === 0 && columns < count) {
+    for (let candidate = columns; candidate >= 1; candidate--) {
+      if (count % candidate === 0) { columns = candidate; break; }
+    }
+  }
+  devices.style.setProperty("--columns", columns);
+}
+window.addEventListener("resize", updateDeviceColumns);
+updateDeviceColumns();
+</script></html>""")
     return path

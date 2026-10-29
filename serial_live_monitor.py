@@ -1,14 +1,23 @@
 """Desktop console for live, unfiltered multi-device serial sessions."""
 
 import argparse
-from collections import deque
+import base64
+import math
 import queue
 import threading
 import webbrowser
 from pathlib import Path
 
-from live_serial import LiveSession, create_report, event_text
+from live_serial import LiveSession, SerialReplyDecoder, create_report
 from serial_at_test import DEFAULT_CONFIG_PATH, load_config, load_raw_config
+
+
+def device_columns(width: int, count: int) -> int:
+    """Match the report's 360px cards and prefer complete rows for even counts."""
+    columns = min(count, max(1, (width + 10) // 370))
+    if count % 2 == 0 and columns < count:
+        columns = next(candidate for candidate in range(columns, 0, -1) if count % candidate == 0)
+    return max(1, columns)
 
 
 def main() -> int:
@@ -38,7 +47,7 @@ def main() -> int:
             self.report = None
             self.closing = False
             self.saving = False
-            self.history = deque(maxlen=5000)
+            self.decoders = {port: SerialReplyDecoder() for port in config.ports}
             self.notifications = queue.Queue()
             root.title("Live serial monitor")
             root.geometry("1150x820")
@@ -61,9 +70,6 @@ def main() -> int:
             self.state = tk.StringVar(value="Not connected. Start listening to capture incoming data.")
             ttk.Label(body, textvariable=self.state).pack(anchor="w", pady=8)
             self.port_states = {port: "NOT CONNECTED" for port in config.ports}
-            self.device_state = tk.StringVar()
-            ttk.Label(body, textvariable=self.device_state, wraplength=1050).pack(anchor="w")
-            self.refresh_ports()
 
             composer = ttk.LabelFrame(body, text="Commands to send to every device", padding=10)
             composer.pack(fill="x", pady=12)
@@ -75,43 +81,87 @@ def main() -> int:
             self.commands.insert("1.0", "sta")
             actions = ttk.Frame(composer)
             actions.pack(fill="x")
-            self.send_button = ttk.Button(actions, text="Send command list", command=self.send)
+            self.send_button = ttk.Button(actions, text="Send command list", command=self.send, state="disabled")
             self.send_button.pack(side="left")
-            self.sta_button = ttk.Button(actions, text="Send sta", command=lambda: self.send(["sta"]))
-            self.sta_button.pack(side="left", padx=8)
-            self.con_button = ttk.Button(actions, text="Send con", command=lambda: self.send(["con"]))
-            self.con_button.pack(side="left")
             ttk.Button(actions, text="Load configured commands", command=self.load_commands).pack(side="right")
+            quick_actions = ttk.Frame(composer)
+            quick_actions.pack(fill="x", pady=(8, 0))
+            self.send_buttons = [self.send_button]
+            for command in ("sta", "con", "eve", "b", "fast"):
+                button = ttk.Button(
+                    quick_actions, text=f"Send {command}", state="disabled",
+                    command=lambda command=command: self.send([command]),
+                )
+                button.pack(side="left", padx=(0, 8))
+                self.send_buttons.append(button)
             ttk.Label(
                 composer, text="Only commands you send here are transmitted. Pre/post commands do not run automatically.",
             ).pack(anchor="w", pady=(8, 0))
 
-            filters = ttk.Frame(body)
-            filters.pack(fill="x")
-            ttk.Label(filters, text="Show device:").pack(side="left")
-            self.port_filter = tk.StringVar(value="All devices")
-            selector = ttk.Combobox(
-                filters, textvariable=self.port_filter,
-                values=["All devices", *config.ports], state="readonly", width=18,
-            )
-            selector.pack(side="left", padx=8)
-            selector.bind("<<ComboboxSelected>>", self.redraw)
+            display_controls = ttk.Frame(body)
+            display_controls.pack(fill="x")
+            ttk.Label(display_controls, text="Live device replies").pack(side="left")
             self.follow = tk.BooleanVar(value=True)
-            ttk.Checkbutton(filters, text="Follow latest", variable=self.follow).pack(side="right")
-            self.output = ScrolledText(
-                body, wrap="word", state="disabled", font=("Consolas", 10),
-                background="#111b25", foreground="#e9f0f7", insertbackground="white",
-            )
-            self.output.pack(fill="both", expand=True, pady=8)
-            for tag, color in (("tx", "#80d9ff"), ("rx", "#a6e2a0"), ("error", "#ffad9f")):
-                self.output.tag_configure(tag, foreground=color)
+            ttk.Checkbutton(display_controls, text="Follow latest", variable=self.follow).pack(side="right")
+            self.panes = ttk.Frame(body)
+            self.panes.pack(fill="both", expand=True, pady=8)
+            self.outputs = {}
+            self.device_states = {}
+            self.device_frames = []
+            self.layout_size = (0, 0)
+            self.layout_columns = None
+            for port in config.ports:
+                pane = ttk.LabelFrame(self.panes, text=port, padding=5)
+                self.device_frames.append(pane)
+                self.device_states[port] = tk.StringVar(value="NOT CONNECTED")
+                ttk.Label(pane, textvariable=self.device_states[port], wraplength=330).pack(anchor="w")
+                output = ScrolledText(
+                    pane, wrap="none", state="disabled", font=("Consolas", 10),
+                    width=1, height=1, background="#111b25", foreground="#e9f0f7",
+                    insertbackground="white",
+                )
+                horizontal = ttk.Scrollbar(pane, orient="horizontal", command=output.xview)
+                horizontal.pack(side="bottom", fill="x")
+                output.configure(xscrollcommand=horizontal.set)
+                output.pack(fill="both", expand=True)
+                output.tag_configure("tx", foreground="#80d9ff")
+                self.outputs[port] = output
+            self.panes.bind("<Configure>", self.reflow_devices)
             ttk.Label(
-                body, text="RX stays active between commands. Display keeps recent events; the disk log keeps the full session.",
+                body, text="Replies stream continuously. Sent commands show timestamps; the disk log timestamps all traffic.",
             ).pack(anchor="w")
             self.root.after(50, self.poll)
 
+        def reflow_devices(self, event):
+            count = len(self.device_frames)
+            columns = device_columns(event.width, count)
+            if columns == self.layout_columns:
+                return
+            for column in range(self.layout_size[0]):
+                self.panes.columnconfigure(column, weight=0, uniform="")
+            for row in range(self.layout_size[1]):
+                self.panes.rowconfigure(row, weight=0, uniform="")
+            rows = math.ceil(count / columns)
+            # Spanning a common grid lets a short final row fill the width too.
+            tracks = math.lcm(columns, count % columns or columns)
+            for column in range(tracks):
+                self.panes.columnconfigure(column, weight=1, uniform="ports")
+            for row in range(rows):
+                self.panes.rowconfigure(row, weight=1, uniform="ports")
+                row_count = min(columns, count - row * columns)
+                span = tracks // row_count
+                for column in range(row_count):
+                    pane = self.device_frames[row * columns + column]
+                    pane.grid(
+                        row=row, column=column * span, columnspan=span,
+                        sticky="nsew", padx=5, pady=5,
+                    )
+            self.layout_columns = columns
+            self.layout_size = (tracks, rows)
+
         def refresh_ports(self):
-            self.device_state.set("   |   ".join(f"{port}: {state}" for port, state in self.port_states.items()))
+            for port, state in self.port_states.items():
+                self.device_states[port].set(state)
 
         def connect(self):
             try:
@@ -120,8 +170,11 @@ def main() -> int:
             except Exception as exc:
                 messagebox.showerror("Could not start listening", str(exc))
                 return
-            self.history.clear()
-            self.redraw()
+            for port, output in self.outputs.items():
+                output.configure(state="normal")
+                output.delete("1.0", "end")
+                output.configure(state="disabled")
+                self.decoders[port] = SerialReplyDecoder()
             self.report = None
             self.report_button.configure(state="disabled")
             self.connect_button.configure(state="disabled")
@@ -164,25 +217,28 @@ def main() -> int:
                 webbrowser.open(self.report.resolve().as_uri())
 
         def append(self, event):
-            if self.port_filter.get() not in ("All devices", event.get("port")) and event.get("port"):
+            port = event.get("port")
+            if port not in self.outputs or event["kind"] not in ("tx", "rx"):
                 return
-            content = event_text(event).replace("\r", "\\r")
-            text = f"{event['timestamp']}  {event.get('port') or 'SESSION'}  {event['kind'].upper()}\n{content}\n\n"
-            self.output.configure(state="normal")
-            self.output.insert("end", text, event["kind"])
-            lines = int(self.output.index("end-1c").split(".")[0])
-            if lines > 15000:
-                self.output.delete("1.0", f"{lines - 12000}.0")
-            self.output.configure(state="disabled")
-            if self.follow.get():
-                self.output.see("end")
+            output = self.outputs[port]
+            if event["kind"] == "rx":
+                text = self.decoders[port].feed(base64.b64decode(event["bytes_base64"]))
+            else:
+                # A timestamp belongs to the sent command, never to a read chunk.
+                prefix = "" if output.get("end-2c", "end-1c") in ("", "\n") else "\n"
+                text = f"{prefix}[{event['timestamp']}] >>> {event['command']}\n"
+            self.insert_reply(port, text, event["kind"])
 
-        def redraw(self, event=None):
-            self.output.configure(state="normal")
-            self.output.delete("1.0", "end")
-            self.output.configure(state="disabled")
-            for record in self.history:
-                self.append(record)
+        def insert_reply(self, port, text, tag="rx"):
+            output = self.outputs[port]
+            output.configure(state="normal")
+            output.insert("end", text, tag)
+            lines = int(output.index("end-1c").split(".")[0])
+            if lines > 15000:
+                output.delete("1.0", f"{lines - 12000}.0")
+            output.configure(state="disabled")
+            if self.follow.get():
+                output.see("end")
 
         def poll(self):
             if self.session is not None:
@@ -191,11 +247,18 @@ def main() -> int:
                         event = self.session.log.events.get_nowait()
                     except queue.Empty:
                         break
-                    self.history.append(event)
                     self.append(event)
                     if event["kind"] == "connection":
+                        if event["status"] == "DISCONNECTED":
+                            self.insert_reply(event["port"], self.decoders[event["port"]].feed(b"", final=True))
                         self.port_states[event["port"]] = event["status"]
                         self.refresh_ports()
+                    if event["kind"] == "command_result":
+                        self.device_states[event["port"]].set(
+                            f"{self.port_states[event['port']]} | {event['command']}: {event['status']}"
+                        )
+                    if event["kind"] == "error" and event.get("port"):
+                        self.device_states[event["port"]].set(f"ERROR: {event['message']}")
                     if event["kind"] == "error" and not event.get("port"):
                         self.state.set(event["message"])
                 ready = (
@@ -204,7 +267,7 @@ def main() -> int:
                 )
             else:
                 ready = False
-            for button in (self.send_button, self.sta_button, self.con_button):
+            for button in self.send_buttons:
                 button.configure(state="normal" if ready else "disabled")
             try:
                 kind, value = self.notifications.get_nowait()

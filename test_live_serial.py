@@ -6,11 +6,38 @@ import tempfile
 import threading
 import time
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 from unittest.mock import patch
 
-from live_serial import LiveSession, create_report
+from live_serial import LiveSession, SerialReplyDecoder, create_report
 from serial_at_test import load_config
+
+
+class ReportTranscripts(HTMLParser):
+    """Read visible transcript text as the browser would, across inline spans."""
+
+    def __init__(self):
+        super().__init__()
+        self.transcripts = {}
+        self.section = None
+        self.in_transcript = False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "section":
+            self.section = attrs["id"]
+        if tag == "pre" and attrs.get("class") == "transcript":
+            self.in_transcript = True
+            self.transcripts[self.section] = ""
+
+    def handle_endtag(self, tag):
+        if tag == "pre":
+            self.in_transcript = False
+
+    def handle_data(self, data):
+        if self.in_transcript:
+            self.transcripts[self.section] += data
 
 
 class FakeDevice:
@@ -54,6 +81,30 @@ class FakeDevice:
 
     def close(self):
         self.closed = True
+
+
+class SerialReplyDecoderTests(unittest.TestCase):
+    def test_partial_reads_do_not_add_display_lines(self):
+        decoder = SerialReplyDecoder()
+        chunks = [b"Mod", b"el: SGS\r", b"\nSta", b"te: Ready\r\n", b"# S", b"GS"]
+        self.assertEqual(
+            "".join(decoder.feed(chunk) for chunk in chunks),
+            "Model: SGS\nState: Ready\n# SGS",
+        )
+
+    def test_line_endings_and_blank_lines_are_preserved(self):
+        decoder = SerialReplyDecoder()
+        self.assertEqual(decoder.feed(b"a\rb\n\r\n\r\nc"), "a\nb\n\n\nc")
+
+    def test_utf8_character_split_across_reads(self):
+        decoder = SerialReplyDecoder()
+        self.assertEqual(decoder.feed(b"Temperature: 20\xc2"), "Temperature: 20")
+        self.assertEqual(decoder.feed(b"\xb0C\r\n"), "\u00b0C\n")
+
+    def test_unfinished_character_is_visible_at_disconnect(self):
+        decoder = SerialReplyDecoder()
+        self.assertEqual(decoder.feed(b"message\xc2"), "message")
+        self.assertEqual(decoder.feed(b"", final=True), "\ufffd")
 
 
 class LiveSessionTests(unittest.TestCase):
@@ -219,6 +270,49 @@ class LiveSessionTests(unittest.TestCase):
         self.assertTrue(session.closed)
         self.assertTrue(all(device.closed for device in self.devices.values()))
         self.assertTrue(create_report(session.log.path).exists())
+
+    def test_report_groups_devices_and_joins_interleaved_partial_replies(self):
+        at = "2026-10-29T10:00:00.123-05:00"
+        events = [{"kind": "session_start", "ports": ["COM1", "COM2", "COM3"]}]
+
+        def rx(port, data):
+            return {"kind": "rx", "port": port, "text": data.decode("utf-8", errors="replace"),
+                    "bytes_base64": base64.b64encode(data).decode("ascii")}
+
+        events.extend([
+            {"kind": "tx", "port": "COM1", "command": "sta"},
+            rx("COM1", b"Temper"),
+            rx("COM2", b"Other device\r"),
+            rx("COM1", b"ature: 20\xc2"),
+            {"kind": "command_result", "port": "COM1", "status": "OK", "command": "sta"},
+            rx("COM1", b"\xb0C\r"),
+            rx("COM2", b"\n\r\n# SGS"),
+            rx("COM1", b"\nState: <ready>\r\n\r\n# SGS"),
+        ])
+        path = self.root / "split.jsonl"
+        path.write_text("\n".join(json.dumps({"timestamp": at, **event}) for event in events), encoding="utf-8")
+        original = path.read_bytes()
+        view = create_report(path).read_text(encoding="utf-8")
+        parsed = ReportTranscripts()
+        parsed.feed(view)
+        self.assertEqual(parsed.transcripts, {
+            "device-0": f"[{at}] >>> sta\nTemperature: 20\u00b0C\nState: <ready>\n\n# SGS",
+            "device-1": "Other device\n\n# SGS",
+            "device-2": "",
+        })
+        self.assertIn(f'title="Received {at}"', view)
+        self.assertIn("&lt;ready&gt;", view)
+        self.assertNotIn("<ready>", view)
+        self.assertEqual(path.read_bytes(), original)
+
+    def test_report_joins_legacy_text_records_without_raw_bytes(self):
+        path = self.root / "legacy.jsonl"
+        events = [{"kind": "rx", "port": "COM1", "timestamp": "time", "text": text}
+                  for text in ("State: Re", "ady\r", "\n# SGS")]
+        path.write_text("\n".join(json.dumps(event) for event in events), encoding="utf-8")
+        parsed = ReportTranscripts()
+        parsed.feed(create_report(path).read_text(encoding="utf-8"))
+        self.assertEqual(parsed.transcripts["device-0"], "State: Ready\n# SGS")
 
 
 if __name__ == "__main__":

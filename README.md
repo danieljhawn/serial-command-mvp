@@ -205,16 +205,22 @@ dependency. The existing one-shot collector remains available.
    buffers are not cleared. Boot messages and unsolicited data remain in the log.
 2. Enter one command or paste a list with one command per line. **Send command list**
    sends each step to every device, with their writes coordinated together.
-   **Send sta** and **Send con** are quick actions. **Load configured commands**
+   **Send sta**, **Send con**, **Send eve**, **Send b**, and **Send fast** are quick actions.
+   **Load configured commands**
    fills the editor from `commands` without sending anything.
 3. Each device must return its configured prompt before the next command is sent
    to any device. All configured devices must be connected before sending a list.
    Only one list runs at a time. A timeout/error cancels the remaining commands;
    a timed-out device stays open so late responses can still be captured.
-4. Use the device filter to inspect one device or all devices. **Follow latest**
-   controls automatic scrolling. The display keeps recent events; the disk log
-   preserves the whole session. Echoes, prompts, blank lines, and unexpected output
-   are included. `\r` represents carriage returns in the desktop display.
+4. Each COM port has its own output pane, so all devices are visible together.
+   Panes fill the window width, divide each row evenly, and reflow when resized.
+   Replies stream directly into their pane with normal line endings; partial serial
+   reads do not add extra headers or line breaks. Echoes, prompts, blank lines, and
+   unexpected output are included. Long lines scroll horizontally instead of wrapping.
+   Sent commands have timestamped markers; connection states and command results
+   appear above each pane. **Follow latest** controls automatic scrolling for all
+   panes. Each pane keeps recent output; the disk log preserves the whole session
+   with timestamps for every sent and received chunk.
 5. Click **Stop & save report**, then **Open saved report**. Closing the window also
    stops the session and saves the report. You can start another session afterward.
 
@@ -252,8 +258,18 @@ bytes are replies to that command. Completion uses the configured prompt, so a
 late prompt or unsolicited prompt-like line cannot be distinguished from a reply
 by this protocol alone. Before retrying a timed-out device, wait for it to settle.
 
-If the app is interrupted before creating the HTML report, regenerate it from
-the saved JSONL file without connecting to any devices:
+The HTML report groups the transcript into one section per COM port, with links
+to jump between devices. Device sections fill the browser width and wrap into
+evenly divided rows as the window is resized, including a short final row.
+Replies have normal line breaks and retain their spacing;
+partial reads do not become separate rows. Sent commands have timestamped markers.
+Hover over received text to see its capture timestamp. Connection events, errors,
+and command results are available in each device's expandable activity table;
+session events have their own expandable table.
+
+To update an older HTML report to this layout, or recover a report after an
+interrupted session, regenerate it from the saved JSONL file without connecting
+to any devices. This replaces the matching HTML report and preserves the JSONL:
 
 ```powershell
 .\.venv\Scripts\python.exe serial_live_monitor.py --report logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
