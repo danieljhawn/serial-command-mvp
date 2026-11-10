@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "test_sequences": {
+    "High Current Seq W Short Current": "30s 300a 10ms 1000a 1s 0a 10ms 950a 1s 0a 10ms 980a 1s 0a 10ms 1400a",
+    "High Short Current 1000a": "30s 300a 10ms 1200a",
+    "High Short Current 800a": "30s 300a 10ms 800a",
+    "High Short Current 400a": "30s 300a 10ms 400a",
+    "High Shorter Current 1000a": "30s 300a 6ms 1200a",
+    "High Shorter Current 800a": "30s 300a 6ms 800a",
+    "High Shorter Current 400a": "30s 300a 6ms 400a"
+  },
+  "sequence_metadata": {
+    "High Current Seq W Short Current": {
+      "total_duration_ms": 33040,
+      "total_duration_seconds": 33.04,
+      "total_duration_human": "33.040s",
+      "step_count": 8,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 1000
+        },
+        {
+          "duration_ms": 1000,
+          "amperage_a": 0
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 950
+        },
+        {
+          "duration_ms": 1000,
+          "amperage_a": 0
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 980
+        },
+        {
+          "duration_ms": 1000,
+          "amperage_a": 0
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 1400
+        }
+      ]
+    },
+    "High Short Current 1000a": {
+      "total_duration_ms": 30010,
+      "total_duration_seconds": 30.01,
+      "total_duration_human": "30.010s",
+      "step_count": 2,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 1200
+        }
+      ]
+    },
+    "High Short Current 800a": {
+      "total_duration_ms": 30010,
+      "total_duration_seconds": 30.01,
+      "total_duration_human": "30.010s",
+      "step_count": 2,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 800
+        }
+      ]
+    },
+    "High Short Current 400a": {
+      "total_duration_ms": 30010,
+      "total_duration_seconds": 30.01,
+      "total_duration_human": "30.010s",
+      "step_count": 2,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 10,
+          "amperage_a": 400
+        }
+      ]
+    },
+    "High Shorter Current 1000a": {
+      "total_duration_ms": 30006,
+      "total_duration_seconds": 30.006,
+      "total_duration_human": "30.006s",
+      "step_count": 2,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 6,
+          "amperage_a": 1200
+        }
+      ]
+    },
+    "High Shorter Current 800a": {
+      "total_duration_ms": 30006,
+      "total_duration_seconds": 30.006,
+      "total_duration_human": "30.006s",
+      "step_count": 2,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 6,
+          "amperage_a": 800
+        }
+      ]
+    },
+    "High Shorter Current 400a": {
+      "total_duration_ms": 30006,
+      "total_duration_seconds": 30.006,
+      "total_duration_human": "30.006s",
+      "step_count": 2,
+      "steps": [
+        {
+          "duration_ms": 30000,
+          "amperage_a": 300
+        },
+        {
+          "duration_ms": 6,
+          "amperage_a": 400
+        }
+      ]
+    }
+  }
+}

@@ -601,6 +601,9 @@
       subtitle.textContent = `${countKind(events, "test")} tests | ${countKind(events, "log")} collection logs | ${countKind(events, "configure")} configure logs | ${formatDate(bounds.start)} to ${formatDate(bounds.end)}${scale.gaps.length ? ` | ${scale.gaps.length} gap(s) compressed` : ""}`;
       timelineCount.textContent = `${events.length} events`;
       renderTimeline(events, scale);
+      const warnings = window.TIMELINE_DATA.warnings || [];
+      if (warnings.length) subtitle.textContent += " | " + warnings.length + " capture warning(s)";
+      subtitle.title = warnings.join("\n");
       if (selectedEventId) {
         const selected = events.find(event => event.id === selectedEventId);
         if (selected) {
@@ -751,7 +754,9 @@
       detailBody.querySelector(".time").textContent = `${formatDate(event.timestamp)} to ${formatDate(event.finished_at)}`;
       detailBody.querySelector(".title").textContent = event.title;
       const pills = detailBody.querySelector(".pill-row");
-      addPill(pills, event.kind === "configure" ? "configure" : "collection");
+      addPill(pills, event.source_type === "live" ? "live capture" : event.kind === "configure" ? "configure" : "collection");
+      if (event.status) addPill(pills, event.status);
+      for (const message of event.messages || []) addPill(pills, message, "error");
       addPill(pills, event.error_count ? `${event.error_count} errors` : "OK", event.error_count ? "error" : "ok");
       addPill(pills, event.position_label || "unmatched");
       addPill(pills, `Commands: ${(event.commands || []).join(", ")}`);

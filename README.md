@@ -187,6 +187,135 @@ These checks use simulated serial ports and temporary output folders. They cover
 CLI modes, config validation, startup cancellation, command errors/timeouts,
 log timing fields, and viewer generation without accessing connected devices.
 
+## Live Serial Monitor (experimental)
+
+The `feature/live-monitor` branch adds a desktop console that keeps every configured
+port open and continuously captures incoming data, even when no command is running:
+
+```powershell
+.\.venv\Scripts\python.exe serial_live_monitor.py
+```
+
+Use `--config PATH` to choose another collection config. It uses the existing
+ports, baud, timeout, prompt, line-ending, log-folder, and suite settings.
+The desktop window uses Python's bundled Tkinter; `pyserial` is the only external
+dependency. The existing one-shot collector remains available.
+
+1. Click **Start listening**. No commands are sent automatically, and serial input
+   buffers are not cleared. Boot messages and unsolicited data remain in the log.
+2. Enter one command or paste a list with one command per line. **Send command list**
+   sends each step to every device, with their writes coordinated together.
+   **Send sta**, **Send con**, **Send eve**, **Send b**, and **Send fast** are quick actions.
+   **Load configured commands**
+   fills the editor from `commands` without sending anything.
+3. Each device must return its configured prompt before the next command is sent
+   to any device. All configured devices must be connected before sending a list.
+   Only one list runs at a time. A timeout/error cancels the remaining commands;
+   a timed-out device stays open so late responses can still be captured.
+4. Each COM port has its own output pane, so all devices are visible together.
+   Panes fill the window width, divide each row evenly, and reflow when resized.
+   Replies stream directly into their pane with normal line endings; partial serial
+   reads do not add extra headers or line breaks. Echoes, prompts, blank lines, and
+   unexpected output are included. Long lines scroll horizontally instead of wrapping.
+   Sent commands have timestamped markers; connection states and command results
+   appear above each pane. **Follow latest** controls automatic scrolling for all
+   panes. Each pane keeps recent output; the disk log preserves the whole session
+   with timestamps for every sent and received chunk.
+   Enable **Scroll together** to move all panes to the same relative position
+   using a mouse wheel, scrollbar, Page Up/Down, or Ctrl+Home/End. Horizontal
+   scrollbars and Shift+mouse wheel are linked too. Scrolling back pauses
+   **Follow latest**, so incoming output does not pull you away from older replies.
+5. Click **Stop & save report**, then **Open saved report**. Closing the window also
+   stops the session and saves the report. You can start another session afterward.
+
+Pre/post commands and test-sequence selection are not applied automatically in
+this mode. Only commands you explicitly send are transmitted. Commands may change
+device settings depending on what you enter. Synchronized writes are coordinated
+by software and are not guaranteed to occur at exactly the same physical instant.
+The monitor owns its COM ports while listening, so stop other serial tools using
+those same ports before connecting.
+
+Each session writes:
+
+```text
+logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+logs/live_serial_YYYYMMDD_HHMMSS_microseconds_viewer.html
+```
+
+The JSONL file is appended and flushed after each event, making already-written
+records available during capture. Logging errors stop capture and are surfaced in
+the window. This is a different event format from the collector JSON and is not
+currently imported into the timeline builder. Each record includes a unique
+increasing ID, local timestamp with timezone offset, port, and event type:
+
+- `tx` / `rx`: sent/received chunks, readable text, byte count, and exact bytes as
+  `bytes_base64`. Command sends also identify the command, batch, and step.
+- `command_result`: prompt completion, timeout, error, or cancellation.
+- `connection`, `batch_start`, `batch_end`, `session_start`, `session_end`, and
+  `error`: session and device activity.
+
+Timestamps reflect when the computer writes or reads data, not the device's
+internal event time. Reads may contain partial lines or several lines together.
+RX events retain batch/step context while a command is active, but unexpected
+messages can arrive during that command too; the log does not assert that all RX
+bytes are replies to that command. Completion uses the configured prompt, so a
+late prompt or unsolicited prompt-like line cannot be distinguished from a reply
+by this protocol alone. Before retrying a timed-out device, wait for it to settle.
+
+The HTML report groups the transcript into one section per COM port, with links
+to jump between devices. Device sections fill the browser width and wrap into
+evenly divided rows as the window is resized, including a short final row.
+Replies have normal line breaks and retain their spacing;
+partial reads do not become separate rows. Sent commands have timestamped markers.
+Hover over received text to see its capture timestamp. Connection events, errors,
+and command results are available in each device's expandable activity table;
+session events have their own expandable table.
+The report also has **Scroll together** to link vertical and horizontal scrolling
+between device transcripts. Long transcripts scroll within their own panels;
+positions are matched proportionally because devices can have different log lengths.
+
+To update an older HTML report to this layout, or recover a report after an
+interrupted session, regenerate it from the saved JSONL file without connecting
+to any devices. This replaces the matching HTML report and preserves the JSONL:
+
+```powershell
+.\.venv\Scripts\python.exe serial_live_monitor.py --report logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+```
+
+### Live timeline reports
+
+**Stop & save report** now also saves a timeline next to the live JSONL log.
+Click **Open timeline** to view it. Each session and command batch has a marker,
+with per-device states, command failures, thresholds, and new `eve` entries.
+The timeline uses the original viewer's search, device filters, gap compression,
+and dark mode. Links open the full session transcript, including unsolicited
+traffic received between commands.
+
+Build a timeline from an existing session without opening serial ports:
+
+```powershell
+.\.venv\Scripts\python.exe build_live_timeline.py logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+```
+
+Combine all live sessions under a folder, optionally adding test spreadsheet timestamps:
+
+```powershell
+.\.venv\Scripts\python.exe build_live_timeline.py logs --csv condensedTestResults.csv
+```
+
+The CSV is optional. Folder scans include `live_serial_*.jsonl` recursively.
+Outputs are `<source-name>_timeline_report.html` and a matching
+`_timeline_index.json`. Use `--report PATH` and `--index PATH` to choose output
+locations, or `--no-viewer` to skip opening the browser. Matching session viewers
+are regenerated; JSONL captures are preserved. Interrupted captures retain all
+complete records and show warnings in the timeline subtitle (hover for details).
+
+Run the test suites without connecting to hardware:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest -v test_serial_at_test test_live_serial test_build_live_timeline
+```
+
 ## View Individual Logs
 
 Each collection run saves JSON and, unless `--no-viewer` is used, a matching HTML file:
