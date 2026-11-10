@@ -221,6 +221,10 @@ dependency. The existing one-shot collector remains available.
    appear above each pane. **Follow latest** controls automatic scrolling for all
    panes. Each pane keeps recent output; the disk log preserves the whole session
    with timestamps for every sent and received chunk.
+   Enable **Scroll together** to move all panes to the same relative position
+   using a mouse wheel, scrollbar, Page Up/Down, or Ctrl+Home/End. Horizontal
+   scrollbars and Shift+mouse wheel are linked too. Scrolling back pauses
+   **Follow latest**, so incoming output does not pull you away from older replies.
 5. Click **Stop & save report**, then **Open saved report**. Closing the window also
    stops the session and saves the report. You can start another session afterward.
 
@@ -266,6 +270,9 @@ partial reads do not become separate rows. Sent commands have timestamped marker
 Hover over received text to see its capture timestamp. Connection events, errors,
 and command results are available in each device's expandable activity table;
 session events have their own expandable table.
+The report also has **Scroll together** to link vertical and horizontal scrolling
+between device transcripts. Long transcripts scroll within their own panels;
+positions are matched proportionally because devices can have different log lengths.
 
 To update an older HTML report to this layout, or recover a report after an
 interrupted session, regenerate it from the saved JSONL file without connecting
@@ -275,10 +282,38 @@ to any devices. This replaces the matching HTML report and preserves the JSONL:
 .\.venv\Scripts\python.exe serial_live_monitor.py --report logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
 ```
 
-Run both suites without connecting to hardware:
+### Live timeline reports
+
+**Stop & save report** now also saves a timeline next to the live JSONL log.
+Click **Open timeline** to view it. Each session and command batch has a marker,
+with per-device states, command failures, thresholds, and new `eve` entries.
+The timeline uses the original viewer's search, device filters, gap compression,
+and dark mode. Links open the full session transcript, including unsolicited
+traffic received between commands.
+
+Build a timeline from an existing session without opening serial ports:
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest -v test_serial_at_test test_live_serial
+.\.venv\Scripts\python.exe build_live_timeline.py logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+```
+
+Combine all live sessions under a folder, optionally adding test spreadsheet timestamps:
+
+```powershell
+.\.venv\Scripts\python.exe build_live_timeline.py logs --csv condensedTestResults.csv
+```
+
+The CSV is optional. Folder scans include `live_serial_*.jsonl` recursively.
+Outputs are `<source-name>_timeline_report.html` and a matching
+`_timeline_index.json`. Use `--report PATH` and `--index PATH` to choose output
+locations, or `--no-viewer` to skip opening the browser. Matching session viewers
+are regenerated; JSONL captures are preserved. Interrupted captures retain all
+complete records and show warnings in the timeline subtitle (hover for details).
+
+Run the test suites without connecting to hardware:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest -v test_serial_at_test test_live_serial test_build_live_timeline
 ```
 
 ## View Individual Logs

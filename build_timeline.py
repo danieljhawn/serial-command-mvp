@@ -485,7 +485,7 @@ def write_report(index: dict[str, Any], viewer_path: Path, report_path: Path) ->
     marker = "// TIMELINE_DATA"
     if marker not in viewer_html:
         raise ValueError(f"Timeline viewer template is missing marker: {marker}")
-    embedded = f"window.TIMELINE_DATA = {json.dumps(index, indent=2)};"
+    embedded = "window.TIMELINE_DATA = " + json.dumps(index, indent=2).replace("<", "\\u003c") + ";"
     report_path.write_text(viewer_html.replace(marker, embedded, 1), encoding="utf-8")
 
 

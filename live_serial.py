@@ -432,7 +432,7 @@ a{color:#80d9ff}nav{display:flex;flex-wrap:wrap;gap:16px;margin:24px 0}
 .device{flex:1 1 calc((100% - (var(--columns) - 1) * 10px) / var(--columns));
 max-width:100%;background:#16232f;border:1px solid #304252;border-radius:8px;padding:18px;
 scroll-margin-top:16px;min-width:0}h2{margin-top:0}
-.transcript{white-space:pre;overflow:auto;padding:16px;background:#101820;
+.transcript{white-space:pre;overflow:auto;max-height:65vh;padding:16px;background:#101820;
 font:13px/1.5 Consolas,monospace;tab-size:8}.rx{color:#a6e2a0}.tx{color:#80d9ff}
 details{margin:16px 0}summary{cursor:pointer}table{border-collapse:collapse;width:100%}
 th,td{text-align:left;padding:10px;border-bottom:1px solid #304252;vertical-align:top}
@@ -443,6 +443,7 @@ td pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:13px Consolas,m
 sent commands and timestamps. Hover over received text to see its capture timestamp.
 Exact bytes and every chunk timestamp remain in the JSONL log.</p>""")
             output.write(f"<p>Source: {html.escape(log_path.name)}</p>")
+            output.write('<label><input type="checkbox" id="scroll-together"> Scroll together</label>')
             if incomplete:
                 output.write(f'<p class="notice">Incomplete log record skipped. Skipped records: {incomplete}.</p>')
             output.write('<nav aria-label="Devices">')
@@ -452,7 +453,7 @@ Exact bytes and every chunk timestamp remain in the JSONL log.</p>""")
             for index, (port, device) in enumerate(devices.items()):
                 device.received(device.decoder.feed(b"", final=True))
                 output.write(f'<section class="device" id="device-{index}"><h2>{html.escape(port)}</h2>')
-                output.write('<pre class="transcript">')
+                output.write('<pre class="transcript" tabindex="0">')
                 device.transcript.seek(0)
                 shutil.copyfileobj(device.transcript, output)
                 output.write("</pre><details><summary>Device activity and command results</summary>")
@@ -480,5 +481,35 @@ function updateDeviceColumns() {
 }
 window.addEventListener("resize", updateDeviceColumns);
 updateDeviceColumns();
+const scrollTogether = document.getElementById("scroll-together");
+const transcripts = [...document.querySelectorAll(".transcript")];
+const syncedOffsets = new Map();
+let lastScrolled = transcripts[0];
+function syncTranscripts(source) {
+  if (!source) return;
+  const vertical = source.scrollTop / Math.max(1, source.scrollHeight - source.clientHeight);
+  const horizontal = source.scrollLeft / Math.max(1, source.scrollWidth - source.clientWidth);
+  for (const target of transcripts) {
+    if (target === source) continue;
+    target.scrollTop = vertical * Math.max(0, target.scrollHeight - target.clientHeight);
+    target.scrollLeft = horizontal * Math.max(0, target.scrollWidth - target.clientWidth);
+    // Scroll events arrive asynchronously, so ignore the resulting follower
+    // event by its actual clamped offsets rather than a temporary boolean flag.
+    syncedOffsets.set(target, {top: target.scrollTop, left: target.scrollLeft});
+  }
+}
+for (const transcript of transcripts) {
+  transcript.addEventListener("scroll", () => {
+    const expected = syncedOffsets.get(transcript);
+    syncedOffsets.delete(transcript);
+    if (expected && Math.abs(transcript.scrollTop - expected.top) < 1 &&
+        Math.abs(transcript.scrollLeft - expected.left) < 1) return;
+    lastScrolled = transcript;
+    if (scrollTogether.checked) syncTranscripts(transcript);
+  });
+}
+scrollTogether.addEventListener("change", () => {
+  if (scrollTogether.checked) syncTranscripts(lastScrolled);
+});
 </script></html>""")
     return path

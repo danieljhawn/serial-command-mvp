@@ -45,6 +45,7 @@ def main() -> int:
             self.root = root
             self.session = None
             self.report = None
+            self.timeline = None
             self.closing = False
             self.saving = False
             self.decoders = {port: SerialReplyDecoder() for port in config.ports}
@@ -67,6 +68,8 @@ def main() -> int:
             self.stop_button.pack(side="left", padx=8)
             self.report_button = ttk.Button(toolbar, text="Open saved report", command=self.open_report, state="disabled")
             self.report_button.pack(side="left")
+            self.timeline_button = ttk.Button(toolbar, text="Open timeline", command=self.open_timeline, state="disabled")
+            self.timeline_button.pack(side="left", padx=8)
             self.state = tk.StringVar(value="Not connected. Start listening to capture incoming data.")
             ttk.Label(body, textvariable=self.state).pack(anchor="w", pady=8)
             self.port_states = {port: "NOT CONNECTED" for port in config.ports}
@@ -103,6 +106,12 @@ def main() -> int:
             ttk.Label(display_controls, text="Live device replies").pack(side="left")
             self.follow = tk.BooleanVar(value=True)
             ttk.Checkbutton(display_controls, text="Follow latest", variable=self.follow).pack(side="right")
+            self.scroll_together = tk.BooleanVar(value=False)
+            self.scroll_source = None
+            ttk.Checkbutton(
+                display_controls, text="Scroll together", variable=self.scroll_together,
+                command=self.align_scrolling,
+            ).pack(side="right", padx=12)
             self.panes = ttk.Frame(body)
             self.panes.pack(fill="both", expand=True, pady=8)
             self.outputs = {}
@@ -120,17 +129,69 @@ def main() -> int:
                     width=1, height=1, background="#111b25", foreground="#e9f0f7",
                     insertbackground="white",
                 )
-                horizontal = ttk.Scrollbar(pane, orient="horizontal", command=output.xview)
+                horizontal = ttk.Scrollbar(
+                    pane, orient="horizontal",
+                    command=lambda *args, port=port: self.scroll_device(port, "x", *args),
+                )
                 horizontal.pack(side="bottom", fill="x")
                 output.configure(xscrollcommand=horizontal.set)
+                output.vbar.configure(
+                    command=lambda *args, port=port: self.scroll_device(port, "y", *args),
+                )
                 output.pack(fill="both", expand=True)
                 output.tag_configure("tx", foreground="#80d9ff")
                 self.outputs[port] = output
+                output.bind("<MouseWheel>", lambda event, port=port: self.mouse_scroll(event, port, "y"))
+                output.bind("<Shift-MouseWheel>", lambda event, port=port: self.mouse_scroll(event, port, "x"))
+                for key, amount in (("<Prior>", -1), ("<Next>", 1)):
+                    output.bind(key, lambda event, port=port, amount=amount: self.scroll_device(port, "y", "scroll", amount, "pages"))
+                for key, position in (("<Control-Home>", 0), ("<Control-End>", 1)):
+                    output.bind(key, lambda event, port=port, position=position: self.scroll_device(port, "y", "moveto", position))
+                for key, amount in (("<Button-4>", -3), ("<Button-5>", 3)):
+                    output.bind(key, lambda event, port=port, amount=amount: self.scroll_device(port, "y", "scroll", amount, "units"))
             self.panes.bind("<Configure>", self.reflow_devices)
             ttk.Label(
                 body, text="Replies stream continuously. Sent commands show timestamps; the disk log timestamps all traffic.",
             ).pack(anchor="w")
             self.root.after(50, self.poll)
+
+        def mouse_scroll(self, event, port, axis):
+            if event.delta:
+                steps = max(1, abs(event.delta) // 120)
+                self.scroll_device(port, axis, "scroll", -3 * steps if event.delta > 0 else 3 * steps, "units")
+            return "break"
+
+        def scroll_device(self, port, axis, *args):
+            """Handle user scrolling without synchronizing incoming-data updates."""
+            output = self.outputs[port]
+            view = output.yview if axis == "y" else output.xview
+            view(*args)
+            self.scroll_source = port
+            if axis == "y" and output.yview()[1] < 0.999999:
+                self.follow.set(False)
+            if self.scroll_together.get():
+                self.sync_scroll(port, axis)
+            return "break"
+
+        def sync_scroll(self, port, axis):
+            source = self.outputs[port]
+            first, last = source.yview() if axis == "y" else source.xview()
+            extent = 1 - (last - first)
+            if extent <= 0:
+                return
+            progress = min(1, max(0, first / extent))
+            for other_port, output in self.outputs.items():
+                if other_port == port:
+                    continue
+                view = output.yview if axis == "y" else output.xview
+                start, end = view()
+                view("moveto", progress * max(0, 1 - (end - start)))
+
+        def align_scrolling(self):
+            if self.scroll_together.get():
+                source = self.scroll_source or next(iter(self.outputs))
+                self.sync_scroll(source, "y")
+                self.sync_scroll(source, "x")
 
         def reflow_devices(self, event):
             count = len(self.device_frames)
@@ -176,7 +237,9 @@ def main() -> int:
                 output.configure(state="disabled")
                 self.decoders[port] = SerialReplyDecoder()
             self.report = None
+            self.timeline = None
             self.report_button.configure(state="disabled")
+            self.timeline_button.configure(state="disabled")
             self.connect_button.configure(state="disabled")
             self.stop_button.configure(state="normal")
             self.state.set(f"Listening. Full session log: {self.session.log.path}")
@@ -206,7 +269,14 @@ def main() -> int:
 
             def finish():
                 try:
-                    self.notifications.put(("saved", session.stop()))
+                    report = session.stop()
+                    from build_live_timeline import create_timeline
+                    try:
+                        timeline = create_timeline(session.log.path)
+                    except Exception as exc:
+                        self.notifications.put(("saved", (report, None, str(exc))))
+                    else:
+                        self.notifications.put(("saved", (report, timeline, "")))
                 except Exception as exc:
                     self.notifications.put(("error", str(exc)))
 
@@ -215,6 +285,10 @@ def main() -> int:
         def open_report(self):
             if self.report is not None:
                 webbrowser.open(self.report.resolve().as_uri())
+
+        def open_timeline(self):
+            if self.timeline is not None:
+                webbrowser.open(self.timeline.resolve().as_uri())
 
         def append(self, event):
             port = event.get("port")
@@ -277,9 +351,10 @@ def main() -> int:
                 self.saving = False
                 self.connect_button.configure(state="normal")
                 if kind == "saved":
-                    self.report = value
+                    self.report, self.timeline, timeline_error = value
                     self.report_button.configure(state="normal")
-                    self.state.set(f"Session saved. Report: {value}")
+                    self.timeline_button.configure(state="normal" if self.timeline else "disabled")
+                    self.state.set(f"Session saved. Report: {self.report}. Timeline: {self.timeline or timeline_error}")
                 else:
                     self.state.set(f"Save failed: {value}. Captured JSONL may still be recoverable.")
                     messagebox.showerror("Could not save report", value)

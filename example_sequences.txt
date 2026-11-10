@@ -1,0 +1,7 @@
+High Current Seq W Short Current = 30s 300a 10ms 1000a 1s 0a 10ms 950a 1s 0a 10ms 980a 1s 0a 10ms 1400a
+High Short Current 1000a = 30s 300a 10ms 1200a
+High Short Current 800a = 30s 300a 10ms 800a
+High Short Current 400a = 30s 300a 10ms 400a
+High Shorter Current 1000a = 30s 300a 6ms 1200a
+High Shorter Current 800a = 30s 300a 6ms 800a
+High Shorter Current 400a = 30s 300a 6ms 400a
