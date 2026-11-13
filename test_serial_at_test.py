@@ -71,7 +71,7 @@ class CollectorTests(unittest.TestCase):
             collector, "open_serial", side_effect=lambda port, config: devices[port]
         ), patch("builtins.input", side_effect=AssertionError("Unexpected sequence prompt")):
             result = collector.main()
-        logs = list((self.root / "logs").glob("serial_log_*.json"))
+        logs = list((self.root / "logs").rglob("serial_log_*.json"))
         self.assertEqual(len(logs), 1)
         return result, logs[0], json.loads(logs[0].read_text(encoding="utf-8"))
 
@@ -187,7 +187,7 @@ class CollectorTests(unittest.TestCase):
             collector, "open_serial", side_effect=serial.SerialException("port unavailable")
         ):
             self.assertEqual(collector.main(), 1)
-        path = next((self.root / "logs").glob("serial_log_*.json"))
+        path = next((self.root / "logs").rglob("serial_log_*.json"))
         log = json.loads(path.read_text(encoding="utf-8"))
         for device in log["devices"].values():
             self.assertEqual(device["status"], "ERROR")

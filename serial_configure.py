@@ -10,6 +10,8 @@ from typing import Any
 
 import serial
 
+from log_paths import log_folder
+
 
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("device_configure.json")
 VIEWER_PATH = Path(__file__).with_name("configure_viewer.html")
@@ -25,6 +27,7 @@ class ConfigureConfig:
     prompt_prefix: str
     line_ending: str
     log_dir: Path
+    test_suite: str = "Device Configuration"
 
 
 def parse_args() -> argparse.Namespace:
@@ -82,6 +85,7 @@ def load_config(path: Path, port_override: str | None = None) -> ConfigureConfig
         prompt_prefix=str(raw_config.get("prompt_prefix", "# SGS")),
         line_ending=line_ending,
         log_dir=Path(str(raw_config.get("log_dir", "logs"))),
+        test_suite=str(raw_config.get("test_suite", "Device Configuration")),
     )
 
 
@@ -283,12 +287,9 @@ def run_command(ser: serial.Serial, phase: str, command: str, config: ConfigureC
 
 
 def make_log_path(config: ConfigureConfig, config_path: Path) -> Path:
-    log_dir = config.log_dir
-    if not log_dir.is_absolute():
-        log_dir = config_path.parent / log_dir
-
-    log_dir.mkdir(parents=True, exist_ok=True)
-    filename = f"configure_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    started_at = datetime.now().astimezone()
+    log_dir = log_folder(config.log_dir, config_path, config.test_suite, started_at)
+    filename = f"configure_log_{started_at.strftime('%Y%m%d_%H%M%S')}.json"
     return log_dir / filename
 
 

@@ -18,6 +18,8 @@ from typing import Any
 
 import serial
 
+from log_paths import log_folder
+
 
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("collection_config.json")
 VIEWER_PATH = Path(__file__).with_name("log_viewer.html")
@@ -618,12 +620,9 @@ def record_port_failure(
 
 
 def make_log_path(config: SerialConfig, config_path: Path) -> Path:
-    log_dir = config.log_dir
-    if not log_dir.is_absolute():
-        log_dir = config_path.parent / log_dir
-
-    log_dir.mkdir(parents=True, exist_ok=True)
-    filename = f"serial_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    started_at = datetime.now().astimezone()
+    log_dir = log_folder(config.log_dir, config_path, config.test_suite, started_at)
+    filename = f"serial_log_{started_at.strftime('%Y%m%d_%H%M%S')}.json"
     return log_dir / filename
 
 

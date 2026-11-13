@@ -115,7 +115,7 @@ only the status command plus any pre/post commands.
 | `timeout` | `10.0` | Positive, finite number of seconds to wait for the prompt after each command. Also bounds serial writes and the wait for all ports to finish startup. |
 | `prompt_prefix` | `"# SGS"` | Nonblank prompt text. A response line starting with this text, after leading whitespace, marks completion. |
 | `line_ending` | `"cr"` | `none`, `cr`, `lf`, or `crlf` (case-insensitive). Appended to each command. |
-| `log_dir` | `"logs"` | Nonblank output path. Relative paths resolve from the config file's folder; absolute paths are used directly. |
+| `log_dir` | `"logs"` | Base output folder. Logs are grouped under `YYYY-MM-DD/TEST_SUITE/` inside it. Relative paths resolve from the config file's folder; absolute paths are used directly. |
 | `pre_commands` | `[]` | ASCII commands sent before the main commands. |
 | `post_commands` | `[]` | ASCII commands sent after the main commands, if earlier commands succeeded. |
 
@@ -235,11 +235,16 @@ by software and are not guaranteed to occur at exactly the same physical instant
 The monitor owns its COM ports while listening, so stop other serial tools using
 those same ports before connecting.
 
+New captures are grouped by the local date when capture starts, then the configured
+`test_suite` name, for example `logs/2026-11-13/Overhead/`. All matching HTML
+reports and live timelines stay beside their capture. Windows-invalid characters
+in suite names are replaced with underscores. Existing logs are not moved.
+
 Each session writes:
 
 ```text
-logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
-logs/live_serial_YYYYMMDD_HHMMSS_microseconds_viewer.html
+logs/YYYY-MM-DD/TEST_SUITE/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+logs/YYYY-MM-DD/TEST_SUITE/live_serial_YYYYMMDD_HHMMSS_microseconds_viewer.html
 ```
 
 The JSONL file is appended and flushed after each event, making already-written
@@ -279,7 +284,7 @@ interrupted session, regenerate it from the saved JSONL file without connecting
 to any devices. This replaces the matching HTML report and preserves the JSONL:
 
 ```powershell
-.\.venv\Scripts\python.exe serial_live_monitor.py --report logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+.\.venv\Scripts\python.exe serial_live_monitor.py --report logs/YYYY-MM-DD/TEST_SUITE/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
 ```
 
 ### Live timeline reports
@@ -294,7 +299,7 @@ traffic received between commands.
 Build a timeline from an existing session without opening serial ports:
 
 ```powershell
-.\.venv\Scripts\python.exe build_live_timeline.py logs/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
+.\.venv\Scripts\python.exe build_live_timeline.py logs/YYYY-MM-DD/TEST_SUITE/live_serial_YYYYMMDD_HHMMSS_microseconds.jsonl
 ```
 
 Combine all live sessions under a folder, optionally adding test spreadsheet timestamps:
@@ -321,8 +326,8 @@ Run the test suites without connecting to hardware:
 Each collection run saves JSON and, unless `--no-viewer` is used, a matching HTML file:
 
 ```text
-logs/serial_log_YYYYMMDD_HHMMSS.json
-logs/serial_log_YYYYMMDD_HHMMSS_viewer.html
+logs/YYYY-MM-DD/TEST_SUITE/serial_log_YYYYMMDD_HHMMSS.json
+logs/YYYY-MM-DD/TEST_SUITE/serial_log_YYYYMMDD_HHMMSS_viewer.html
 ```
 
 Open the `_viewer.html` file to inspect one run. The viewer supports:
@@ -370,8 +375,8 @@ python serial_configure.py --config device_configure.json --no-viewer
 The script sends a blank line first and waits for the `# SGS` prompt before applying settings. It then runs verification commands and writes:
 
 ```text
-logs/configure_log_YYYYMMDD_HHMMSS.json
-logs/configure_log_YYYYMMDD_HHMMSS_viewer.html
+logs/YYYY-MM-DD/TEST_SUITE/configure_log_YYYYMMDD_HHMMSS.json
+logs/YYYY-MM-DD/TEST_SUITE/configure_log_YYYYMMDD_HHMMSS_viewer.html
 ```
 
 Open the `_viewer.html` file to scan the captured apply and verify command responses. The configure viewer does not analyze, select, or confirm fields; it is only for readable review and posterity.
@@ -385,7 +390,8 @@ Important fields:
 - `timeout`: seconds to wait for prompt after each command.
 - `prompt_prefix`: prompt text that marks command completion.
 - `line_ending`: command ending, usually `cr`.
-- `log_dir`: output folder for configure logs.
+- `log_dir`: base output folder for configure logs; captures use `YYYY-MM-DD/TEST_SUITE/` subfolders.
+- `test_suite`: optional suite folder name, defaulting to `Device Configuration`. Use the same name as in `collection_config.json` to group configuration and collection logs together.
 - `apply_commands`: setting-changing commands.
 - `verify_commands`: readback commands, usually `con` and `sta`.
 

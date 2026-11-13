@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from serial_at_test import SerialConfig, build_command_bytes, open_serial, prompt_has_returned, timestamp
+from log_paths import log_folder
 
 
 class SerialReplyDecoder:
@@ -225,11 +226,9 @@ class LiveSession:
         self._batch_thread: threading.Thread | None = None
         self._barrier: threading.Barrier | None = None
         self._closed = False
-        folder = config.log_dir
-        if not folder.is_absolute():
-            folder = config_path.parent / folder
-        folder.mkdir(parents=True, exist_ok=True)
-        name = datetime.now().strftime("live_serial_%Y%m%d_%H%M%S_%f.jsonl")
+        started_at = datetime.now().astimezone()
+        folder = log_folder(config.log_dir, config_path, config.test_suite, started_at)
+        name = started_at.strftime("live_serial_%Y%m%d_%H%M%S_%f.jsonl")
         self.log = EventLog(folder / name, self.stopping)
         self.log.record(
             "session_start", schema_version=1, test_suite=config.test_suite,
